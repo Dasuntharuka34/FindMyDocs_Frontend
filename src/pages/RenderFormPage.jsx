@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
+import '../styles/pages/RenderFormPage.css';
 
 const RenderFormPage = () => {
   const { id } = useParams();
@@ -88,12 +89,12 @@ const RenderFormPage = () => {
   }
 
   return (
-    <div>
+    <div className="render-form-page">
       <h2>{form.name}</h2>
       <p>{form.description}</p>
       <form onSubmit={handleSubmit}>
         {form.fields.map(field => (
-          <div key={field._id} style={{ marginBottom: '15px' }}>
+          <div key={field._id} className="form-field">
             <label>{field.label}</label>
             {renderField(field)}
           </div>

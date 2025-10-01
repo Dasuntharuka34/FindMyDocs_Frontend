@@ -230,6 +230,13 @@
 
 /* Responsive adjustments */
 @media (max-width: 900px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "sidebar"
+      "main";
+  }
+
   .profile-content {
     padding: 20px;
   }

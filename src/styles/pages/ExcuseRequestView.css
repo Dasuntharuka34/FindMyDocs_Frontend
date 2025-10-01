@@ -104,3 +104,38 @@
   background-color: #ffebee;
   border-radius: 4px;
 }
+
+@media (max-width: 900px) {
+  .excuse-request-layout {
+    flex-direction: column;
+  }
+
+  .excuse-request-main-content {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .history-header,
+  .history-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .absences-header,
+  .absences-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .history-header div,
+  .history-row div,
+  .absences-header div,
+  .absences-row div {
+    padding: 5px 0;
+  }
+}

@@ -1,0 +1,68 @@
+/* styles/pages/MySubmissionsPage.css */
+
+.my-submissions-page {
+  padding: 20px;
+}
+
+.my-submissions-page h2 {
+  margin-bottom: 20px;
+}
+
+.my-submissions-page table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.my-submissions-page th,
+.my-submissions-page td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.my-submissions-page th {
+  background-color: #f2f2f2;
+}
+
+@media (max-width: 768px) {
+  .my-submissions-page table,
+  .my-submissions-page thead,
+  .my-submissions-page tbody,
+  .my-submissions-page th,
+  .my-submissions-page td,
+  .my-submissions-page tr {
+    display: block;
+  }
+
+  .my-submissions-page thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  .my-submissions-page tr {
+    margin-bottom: 15px;
+  }
+
+  .my-submissions-page td {
+    border: none;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 50%;
+  }
+
+  .my-submissions-page td:before {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    content: attr(data-label);
+    font-weight: bold;
+  }
+
+  .my-submissions-page td:last-child {
+    border-bottom: 0;
+  }
+}

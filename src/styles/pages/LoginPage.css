@@ -238,3 +238,56 @@
     background-color: #da190b;
   }
 
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .login-box {
+    padding: 30px;
+    max-width: 350px;
+  }
+
+  .login-box h2 {
+    font-size: 2rem;
+  }
+
+  .login-logo {
+    width: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-page {
+    padding: 10px;
+  }
+
+  .login-box {
+    padding: 20px;
+    max-width: 100%;
+    border-radius: 8px;
+  }
+
+  .login-box h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+  }
+
+  .form-group input {
+    padding: 10px 12px;
+  }
+
+  .login-btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+
+  .password-input-container input {
+    padding: 10px 12px;
+    padding-right: 35px;
+  }
+
+  .password-toggle-btn {
+    right: 5px;
+    top: 50%;
+  }
+}

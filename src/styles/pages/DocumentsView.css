@@ -144,7 +144,7 @@ body {
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .documents-layout {
     flex-direction: column; /* Stack sidebar and main content vertically */
   }

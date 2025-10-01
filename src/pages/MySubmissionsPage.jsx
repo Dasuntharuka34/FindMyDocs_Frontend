@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
+import '../styles/pages/MySubmissionsPage.css';
 
 const MySubmissionsPage = () => {
   const [submissions, setSubmissions] = useState([]);
@@ -31,7 +31,7 @@ const MySubmissionsPage = () => {
   }
 
   return (
-    <div>
+    <div className="my-submissions-page">
       <h2>My Form Submissions</h2>
       {submissions.length === 0 ? (
         <p>You have not submitted any forms yet.</p>
@@ -47,9 +47,9 @@ const MySubmissionsPage = () => {
           <tbody>
             {submissions.map(submission => (
               <tr key={submission._id}>
-                <td>{submission.form.name}</td>
-                <td>{new Date(submission.submittedAt).toLocaleDateString()}</td>
-                <td>{submission.status}</td>
+                <td data-label="Form Name">{submission.form.name}</td>
+                <td data-label="Submitted At">{new Date(submission.submittedAt).toLocaleDateString()}</td>
+                <td data-label="Status">{submission.status}</td>
               </tr>
             ))}
           </tbody>

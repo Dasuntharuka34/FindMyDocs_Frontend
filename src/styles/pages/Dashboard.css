@@ -284,12 +284,45 @@
     position: static;
   }
   
-  .recent-letters {
-    overflow-x: auto;
+  .recent-letters table,
+  .recent-letters thead,
+  .recent-letters tbody,
+  .recent-letters th,
+  .recent-letters td,
+  .recent-letters tr {
+    display: block;
   }
-  
-  .recent-letters table {
-    min-width: 600px;
+
+  .recent-letters thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  .recent-letters tr {
+    margin-bottom: 15px;
+  }
+
+  .recent-letters td {
+    border: none;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 50%;
+  }
+
+  .recent-letters td:before {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    content: attr(data-label);
+    font-weight: bold;
+  }
+
+  .recent-letters td:last-child {
+    border-bottom: 0;
   }
 }
 

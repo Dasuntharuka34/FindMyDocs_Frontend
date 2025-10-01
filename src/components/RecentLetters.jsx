@@ -47,9 +47,9 @@ function RecentLetters({ letters }) {
           <tbody>
             {letters.map(({ _id, type, status, lastUpdated }) => (
               <tr key={_id}>
-                <td>{_id}</td>
-                <td>{type}</td>
-                <td>
+                <td data-label="ID">{_id}</td>
+                <td data-label="Type">{type}</td>
+                <td data-label="Status">
                   <span
                     className="status-badge"
                     style={{ backgroundColor: statusColors[status] || '#777' }}
@@ -57,8 +57,8 @@ function RecentLetters({ letters }) {
                     {status}
                   </span>
                 </td>
-                <td>{lastUpdated ? new Date(lastUpdated).toLocaleDateString() : 'N/A'}</td>
-                <td>
+                <td data-label="Last Updated">{lastUpdated ? new Date(lastUpdated).toLocaleDateString() : 'N/A'}</td>
+                <td data-label="Action">
                   <Link
                     to={`/documents/${_id}`} // <-- Link to the DocumentsView page
                     className="view-details-btn"

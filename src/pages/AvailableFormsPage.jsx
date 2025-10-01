@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../utils/api';
+import '../styles/pages/AvailableFormsPage.css';
 
 const AvailableFormsPage = () => {
   const [forms, setForms] = useState([]);
@@ -32,7 +32,7 @@ const AvailableFormsPage = () => {
   }
 
   return (
-    <div>
+    <div className="available-forms-page">
       <h2>Available Forms</h2>
       {forms.length === 0 ? (
         <p>No forms available at the moment.</p>
@@ -48,9 +48,9 @@ const AvailableFormsPage = () => {
           <tbody>
             {forms.map(form => (
               <tr key={form._id}>
-                <td>{form.name}</td>
-                <td>{form.description}</td>
-                <td>
+                <td data-label="Form Name">{form.name}</td>
+                <td data-label="Description">{form.description}</td>
+                <td data-label="Action">
                   <Link to={`/fill-form/${form._id}`}>
                     <button>Fill Form</button>
                   </Link>

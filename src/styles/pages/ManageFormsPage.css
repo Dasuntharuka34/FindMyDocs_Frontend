@@ -1,0 +1,107 @@
+/* styles/pages/ManageFormsPage.css */
+
+.manage-forms-page {
+  padding: 20px;
+}
+
+.manage-forms-page h2 {
+  margin-bottom: 20px;
+}
+
+.manage-forms-page .create-form-btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.manage-forms-page .create-form-btn:hover {
+  background-color: #45a049;
+}
+
+.manage-forms-page table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.manage-forms-page th,
+.manage-forms-page td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.manage-forms-page th {
+  background-color: #f2f2f2;
+}
+
+.manage-forms-page .action-btns button {
+  margin-right: 5px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.manage-forms-page .view-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.manage-forms-page .edit-btn {
+  background-color: #ffc107;
+  color: black;
+}
+
+.manage-forms-page .delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .manage-forms-page table,
+  .manage-forms-page thead,
+  .manage-forms-page tbody,
+  .manage-forms-page th,
+  .manage-forms-page td,
+  .manage-forms-page tr {
+    display: block;
+  }
+
+  .manage-forms-page thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  .manage-forms-page tr {
+    margin-bottom: 15px;
+  }
+
+  .manage-forms-page td {
+    border: none;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 50%;
+  }
+
+  .manage-forms-page td:before {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    content: attr(data-label);
+    font-weight: bold;
+  }
+
+  .manage-forms-page td:last-child {
+    border-bottom: 0;
+  }
+}

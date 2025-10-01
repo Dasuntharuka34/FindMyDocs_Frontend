@@ -237,6 +237,7 @@
     text-align: left;
     font-weight: 600;
     color: #1a3e72;
+    content: attr(data-label);
   }
 
 }

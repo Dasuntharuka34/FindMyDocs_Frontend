@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Analytics } from '@vercel/analytics/react';
+
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 // import SpecialDashboard from './components/special-user-dashboard/SpecialDashboard';
@@ -51,7 +51,7 @@ function App() {
 
   return (
     <Router>
-      <Analytics />
+      
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={isLoggedIn ? <Navigate to={user?.role === 'Admin' ? "/admin-dashboard" : "/dashboard"} /> : <LoginPage />} />

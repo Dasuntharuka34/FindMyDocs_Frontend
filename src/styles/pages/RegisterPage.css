@@ -129,3 +129,29 @@ body, html, #root {
 .footer-wrapper {
   padding-top: 20px;
 }
+
+@media (max-width: 768px) {
+  .registration-container {
+    width: 90%;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .registration-container {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .registration-title {
+    font-size: 1.2rem;
+  }
+
+  .registration-subtitle {
+    font-size: 1.5rem;
+  }
+
+  .registration-button {
+    width: 100%;
+  }
+}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../utils/api';
+import '../styles/pages/ManageFormsPage.css';
 
 const ManageFormsPage = () => {
   const [forms, setForms] = useState([]);
@@ -40,10 +41,10 @@ const ManageFormsPage = () => {
   }
 
   return (
-    <div>
+    <div className="manage-forms-page">
       <h2>Manage Forms</h2>
-      <Link to="/admin/forms/new">
-        <button>Create New Form</button>
+      <Link to="/admin/forms/new" className="create-form-btn">
+        Create New Form
       </Link>
       {forms.length === 0 ? (
         <p>No forms created yet.</p>
@@ -58,11 +59,11 @@ const ManageFormsPage = () => {
           <tbody>
             {forms.map(form => (
               <tr key={form._id}>
-                <td>{form.name}</td>
-                <td>
-                  <Link to={`/admin/forms/view/${form._id}`}><button>View</button></Link>
-                  <Link to={`/admin/forms/edit/${form._id}`}><button>Edit</button></Link>
-                  <button onClick={() => handleDelete(form._id)}>Delete</button>
+                <td data-label="Form Name">{form.name}</td>
+                <td data-label="Actions" className="action-btns">
+                  <Link to={`/admin/forms/view/${form._id}`}><button className="view-btn">View</button></Link>
+                  <Link to={`/admin/forms/edit/${form._id}`}><button className="edit-btn">Edit</button></Link>
+                  <button className="delete-btn" onClick={() => handleDelete(form._id)}>Delete</button>
                 </td>
               </tr>
             ))}

@@ -165,11 +165,11 @@ function MyLettersPage() {
                     <tbody>
                       {leaveRequests.map(request => (
                         <tr key={request._id}>
-                          <td>{request.reason}</td>
-                          <td>{new Date(request.submittedDate).toLocaleDateString()}</td>
-                          <td>{new Date(request.startDate).toLocaleDateString()}</td>
-                          <td>{new Date(request.endDate).toLocaleDateString()}</td>
-                          <td>
+                          <td data-label="Reason">{request.reason}</td>
+                          <td data-label="Submitted Date">{new Date(request.submittedDate).toLocaleDateString()}</td>
+                          <td data-label="Start Date">{new Date(request.startDate).toLocaleDateString()}</td>
+                          <td data-label="End Date">{new Date(request.endDate).toLocaleDateString()}</td>
+                          <td data-label="Current Status">
                             <span
                               className="status-badge"
                               style={{ backgroundColor: statusColors[request.status] || '#777' }}
@@ -177,7 +177,7 @@ function MyLettersPage() {
                               {request.status}
                             </span>
                           </td>
-                          <td>
+                          <td data-label="Action">
                             <Link to={`/leave-request/${request._id}`} className="view-details-btn">
                               View Details
                             </Link>
