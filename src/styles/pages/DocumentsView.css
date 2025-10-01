@@ -1,0 +1,176 @@
+/* Overall container for the documents view, similar to Dashboard.css's dashboard-container */
+.documents-view-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensures it takes full viewport height */
+  background-color: #f0f2f5; /* Light grey background for the whole page */
+}
+
+/* Layout for sidebar and main content */
+.documents-layout {
+  display: flex;
+  flex: 1; /* Allows it to take remaining vertical space */
+  width: 100%;
+  background-color: var(--bg-secondary);
+  
+}
+
+/* Main content area for documents details */
+.documents-main-content {
+  flex: 1; /* Allows main content to grow */
+  padding: 30px;
+  max-width: 100%; /* Adjust max-width considering sidebar width (e.g., 250px) */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-primary);
+  box-sizing: border-box; /* Include padding in element's total width */
+  transition: margin-left 0.3s ease; /* Smooth transition for sidebar toggle */
+  background-color: var(--bg-primary);
+}
+
+.documents-view h1, .documents-view h3 {
+  color: #1a3e72; /* Dark blue heading */
+  margin-bottom: 20px;
+}
+
+.document-container {
+  background-color: var(--bg-secondary);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  width: 100%; /* Ensure it takes full width of its parent */
+  box-sizing: border-box; /* Include padding in width */
+}
+
+/* New style for header and back button alignment */
+.document-header-row {
+  display: flex;
+  justify-content: space-between; /* Puts h1 and button on opposite ends */
+  align-items: center; /* Vertically centers them */
+  margin-bottom: 20px; /* Space below this row */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 10px; /* Space between items if they wrap */
+}
+
+.document-header-row h1 {
+  margin-bottom: 0; /* Remove default h1 margin if it conflicts */
+  color: var(--text-h2);
+}
+
+/* Style for the Go Back button */
+.go-back-btn {
+  background-color: #6c757d; /* Grey button */
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  white-space: nowrap; /* Prevent text from wrapping */
+}
+
+.go-back-btn:hover {
+  background-color: #5a6268; /* Darker grey on hover */
+  transform: translateY(-1px);
+}
+
+
+.document-info p {
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+
+.document-info p a {
+  color: var(--text-h2);
+}
+
+.document-info strong {
+  color: var(--thead-text);
+}
+
+.progress-section {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.history-section {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.history-table {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%; /* Ensure table takes full width of its container */
+  box-sizing: border-box;
+}
+
+.history-header, .history-row {
+  display: grid;
+  grid-template-columns: 0.5fr 1.5fr 1fr 1fr 2fr; /* Adjusted for history details */
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  align-items: center;
+}
+
+.history-header {
+  background-color: #d8e5f8;
+  color: #1a3e72;
+  font-weight: 600;
+}
+
+.history-row:last-child {
+  border-bottom: none;
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+}
+
+/* Add some padding to the header and footer if they are sticky */
+body {
+  margin: 0;
+  padding: 0;
+}
+.header, .footer {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .documents-layout {
+    flex-direction: column; /* Stack sidebar and main content vertically */
+  }
+
+  .documents-main-content {
+    margin-left: 0; /* Remove sidebar offset */
+    max-width: 100%; /* Take full width */
+    padding: 15px; /* Adjust padding for smaller screens */
+  }
+
+  /* Adjust sidebar if it collapses or becomes a toggleable menu */
+  /* This assumes your Sidebar component itself handles its responsiveness */
+  .sidebar {
+    width: 100%; /* Full width when stacked */
+    height: auto; /* Height adapts to content */
+    position: relative; /* Not fixed */
+  }
+
+  .document-container {
+    padding: 20px;
+  }
+  .history-header, .history-row {
+    grid-template-columns: 1fr; /* Stack columns on small screens */
+    gap: 5px;
+  }
+  .history-header div, .history-row div {
+    padding: 5px 0;
+  }
+}

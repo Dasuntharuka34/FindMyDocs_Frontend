@@ -1,0 +1,242 @@
+/* Base container and layout styles */
+.pending-approvals-container {
+  width: 100%;
+  height: 100%;
+}
+
+.approvals-layout {
+  display: flex;
+  height: 90%;
+}
+
+.approvals-content {
+  flex: 1;
+  padding: 20px;
+}
+
+/* Style for each request section (Excuse and Leave) */
+.approvals-section {
+  margin-bottom: 30px; /* Provides space between the two tables */
+}
+
+/* Table styling, copied from MyLettersPage for consistency */
+.approvals-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.approvals-table th,
+.approvals-table td {
+  border: 1px solid #e0e0e0;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.approvals-table th {
+  background-color: var(--thead-bg);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.approvals-table tbody tr:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* Status badge styling */
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  color: white;
+  background-color: #787b7e; /* Default gray */
+}
+
+.status-badge.pending,
+.status-badge.pending-lecturer-approval,
+.status-badge.pending-hod-approval,
+.status-badge.pending-dean-approval,
+.status-badge.pending-vc-approval {
+  background-color: orange;
+}
+
+.status-badge.approved {
+  background-color: green;
+}
+
+.status-badge.rejected {
+  background-color: red;
+}
+
+/* Action button styles */
+.approve-btn,
+.reject-btn {
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-right: 5px;
+}
+
+.approve-btn {
+  background-color: #4CAF50; /* Green */
+}
+
+.approve-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-1px);
+}
+
+.reject-btn {
+  background-color: #f44336; /* Red */
+}
+
+.reject-btn:hover {
+  background-color: #da190b;
+  transform: translateY(-1px);
+}
+
+/* "View Details" button style (already consistent) */
+.view-details-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: 0.9rem;
+  display: inline-block;
+  text-align: center;
+}
+
+.view-details-btn:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+/* Modal styling */
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 8px;
+  max-width: 400px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.modal-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-around;
+  gap: 10px;
+}
+
+/* Modal confirmation button styles */
+.modal-buttons .confirm-yes-btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.modal-buttons .confirm-yes-btn:hover {
+  background-color: #45a049;
+}
+
+.modal-buttons .no-btn {
+  background-color: #f44336;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.modal-buttons .no-btn:hover {
+  background-color: #da190b;
+}
+
+.modal-buttons .okey-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.modal-buttons .okey-btn:hover {
+  background-color: #0056b3;
+}
+
+/* --- Responsive Styles (for mobile) --- */
+@media (max-width: 768px) {
+  .approvals-table th,
+  .approvals-table td {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .approvals-table {
+    border: none;
+  }
+
+  .approvals-table thead {
+    display: none; /* Hide header on mobile */
+  }
+
+  .approvals-table tr {
+    border: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+    display: block;
+    background-color: #fff;
+  }
+
+  .approvals-table td {
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+    position: relative;
+    padding-left: 50%;
+    text-align: right;
+    display: block;
+    font-size: 0.9rem;
+  }
+
+  .approvals-table td:before {
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: 600;
+    color: #1a3e72;
+  }
+
+}

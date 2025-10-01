@@ -1,0 +1,131 @@
+/* RegistrationForm.css */
+
+body, html, #root {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+}
+
+.registration-page {
+  height: 100;
+  background: url('../../assets/UOJ_login.jpg') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.registration-container {
+  background-color: var(--bg-primary);
+  border-radius: 10px;
+  width: 520px;
+  padding: 30px 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-sizing: border-box;
+  opacity: 90%;
+}
+
+.registration-container h2,
+.registration-container h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: bold;
+  color: var(--text-h2);
+}
+
+.registration-container h3 {
+  font-weight: 600;
+  color: #666;
+}
+.registration-container p {
+  color: var(--text-primary);
+}
+
+.registration-container p a {
+  color: var(--text-h2);
+}
+
+.registration-input,
+.registration-select {
+  width: 100%;
+  border-radius: 10px;
+  padding: 8px 5px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  background: transparent;
+  color: var(--text-primary);
+  box-sizing: border-box;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  border: 1px solid #ccc;
+
+}
+
+.registration-input::placeholder {
+  color: var(--text-primary);
+}
+
+.registration-input:focus,
+.registration-select:focus {
+  outline: none;
+  border-bottom-color: #4a6cf7;
+}
+
+.registration-button {
+  width: 33.33%;
+  padding: 6px 20px;
+  background: linear-gradient(90deg, #4a6cf7 0%, #7b4ddf 100%);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  display: block;
+  margin: 30px auto;
+}
+
+.registration-button:hover {
+  opacity: 0.9;
+}
+
+.registration-error {
+  color: #e3342f;
+  font-weight: 600;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.form-column {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.registration-title {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text-h2);
+}
+
+.registration-logo {
+  display: block;
+  margin: 0 auto 1.5rem auto;
+  width: 80px;
+  height: auto;
+}
+.footer-wrapper {
+  padding-top: 20px;
+}

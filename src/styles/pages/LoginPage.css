@@ -1,0 +1,240 @@
+.login-page {
+  height: 100vh;
+  background: url('../../assets/UOJ_login.jpg') no-repeat center center ;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-box {
+  background-color: var(--bg-primary);
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  color: #333;
+  opacity: 90%;
+}
+
+.login-logo {
+  width: 150px;
+  height: auto;
+}
+.login-input {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+.login-box h2 {
+  margin-bottom: 30px;
+  color: var(--text-h2); /* Dark blue */
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+.login-box .login-links p{
+  color: var(--text-primary);
+}
+
+.login-box .login-links p a{
+  color: var(--text-h2);
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box; /* Include padding in width */
+}
+
+.login-btn {
+  background: linear-gradient(90deg, #4a6cf7 0%, #7b4ddf 100%);
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.login-btn:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+/* Styles for password show/hide toggle */
+.password-input-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px; /* Adjust margin if needed */
+}
+
+.password-input-container input {
+  width: 100%;
+  padding: 12px 15px;
+  padding-right: 40px; /* Make space for the eye icon */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 37%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem; /* Adjust icon size */
+  color: #6c9ef8; /* Icon color */
+  padding: 0; /* Remove padding */
+}
+
+.password-toggle-btn:hover {
+  color: #5a8be0; /* Hover color */
+}
+
+.register-link {
+  margin-top: 25px;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.register-link a {
+  color: #1a3e72; /* Dark blue link */
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}
+
+/* Modal styles - should be consistent with common-dashboard/NewLetterModal.css */
+/* These are just copied for completeness if NewLetterModal.css isn't automatically applied */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(30, 30, 30, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+.modal-content {
+    background-color: #f2f2f2;
+    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    font-size: 16px;
+    color: #333;
+  }
+
+.modal-close-button {
+  margin-top: 20px;
+  padding: 8px 16px;
+  background: linear-gradient(90deg, #4a6cf7 0%, #7b4ddf 100%);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.modal-close-button:hover {
+  opacity: 0.9;
+}
+  
+  .modal {
+    background-color: #fff;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+    padding: 20px;
+    box-shadow: 0 0 12px rgb(0 0 0 / 0.3);
+    font-size: 1rem;
+    color: #1a3e72;
+    text-align: center; /* Center modal content */
+  }
+  
+  .modal h3 {
+    margin-bottom: 20px;
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+  
+  .modal p {
+      margin-bottom: 20px;
+      color: #333;
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: center; /* Center buttons */
+    gap: 10px; /* Space between buttons */
+  }
+  
+  .modal-actions button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .modal-actions .submit-btn {
+    background-color: #4CAF50; /* Green */
+    color: white;
+  }
+  
+  .modal-actions .submit-btn:hover {
+    background-color: #45a049;
+  }
+  
+  .modal-actions .cancel-btn {
+    background-color: #f44336; /* Red */
+    color: white;
+  }
+  
+  .modal-actions .cancel-btn:hover {
+    background-color: #da190b;
+  }
+

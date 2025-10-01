@@ -1,0 +1,147 @@
+.progress-tracker {
+  background-color: var(--bg-primary);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 6px rgb(0 0 0 / 0.1);
+  flex: 1;
+  min-width: 320px;
+  overflow-x: auto;
+}
+
+.progress-tracker h2 {
+  margin-bottom: 15px;
+  color: var(--text-h2);
+}
+
+.steps-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  position: relative;
+  gap: 20px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  min-width: 100px;
+  z-index: 1;
+}
+
+.step-circle {
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+  background-color: #c5d1f0;
+  color: #5a73b7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.step-label {
+  margin-top: 10px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  word-wrap: break-word;
+  max-width: 100px;
+  transition: all 0.3s ease;
+}
+
+.step-line {
+  position: absolute;
+  height: 4px;
+  background-color: #bcc4dc;
+  top: 16px;
+  left: 50%;
+  width: 100%;
+  z-index: 0;
+  transition: all 0.3s ease;
+}
+
+.step:last-child .step-line {
+  display: none;
+}
+
+/* Completed step */
+.step.completed .step-circle {
+  background-color: #279c4c; /* green */
+  color: white;
+}
+
+.step.active .step-circle {
+  background-color: #eb955c;
+  color: white;
+}
+
+.step.completed .step-line {
+  background-color: #4caf50;
+}
+
+
+
+/* Rejected step */
+.step.rejected .step-circle {
+  background-color: #d32f2f; /* red */
+  color: white;
+  animation: pulse-rejected 1.5s infinite;
+}
+
+.step.rejected .step-label {
+  color: #d32f2f;
+  font-weight: 700;
+}
+
+/* If the request is rejected, make all lines before the rejected stage red */
+.step.rejected ~ .step .step-line {
+  background-color: #ffcdd2; /* light red */
+}
+
+.step.rejected ~ .step.completed .step-line {
+  background-color: #ffcdd2; /* light red for completed steps after rejection */
+}
+
+/* Pulse animation for rejected state */
+@keyframes pulse-rejected {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .steps-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .step {
+    flex-direction: row;
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .step-circle {
+    margin-right: 15px;
+  }
+  
+  .step-line {
+    display: none;
+  }
+  
+  .step-label {
+    margin-top: 0;
+    text-align: left;
+    max-width: none;
+  }
+}
