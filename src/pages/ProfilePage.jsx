@@ -129,25 +129,25 @@ const ProfilePage = ({ isAdmin = false }) => {
     e.preventDefault();
 
     if (!editFormData.name.trim()) return setError("Full Name cannot be empty.");
-    if (!validateEmail(editFormData.email)) return setError("Please enter a valid email address.");
-    if (!validateNic(editFormData.nic)) return setError("Please enter a valid NIC.");
+    // if (!validateEmail(editFormData.email)) return setError("Please enter a valid email address.");
+    // if (!validateNic(editFormData.nic)) return setError("Please enter a valid NIC.");
     if (!validateMobile(editFormData.mobile)) return setError("Please enter a valid 10-digit mobile number.");
-    if (editFormData.role === "Student" && !editFormData.indexNumber.trim())
-      return setError("Student must provide an Index Number.");
+    // if (editFormData.role === "Student" && !editFormData.indexNumber.trim())
+    //   return setError("Student must provide an Index Number.");
     if (editFormData.department.trim() === "")
       return setError("Please select a department.");
 
     try {
       const formDataToSend = new FormData();
       formDataToSend.append('name', editFormData.name);
-      formDataToSend.append('email', editFormData.email);
-      formDataToSend.append('nic', editFormData.nic);
+      // formDataToSend.append('email', editFormData.email);
+      // formDataToSend.append('nic', editFormData.nic);
       formDataToSend.append('department', editFormData.department);
       formDataToSend.append('role', editFormData.role);
       formDataToSend.append('mobile', editFormData.mobile);
-      if (editFormData.role === 'Student') {
-        formDataToSend.append('indexNumber', editFormData.indexNumber);
-      }
+      // if (editFormData.role === 'Student') {
+      //   formDataToSend.append('indexNumber', editFormData.indexNumber);
+      // }
       if (profilePictureFile) {
         formDataToSend.append('profilePicture', profilePictureFile);
       }
@@ -271,11 +271,11 @@ const ProfilePage = ({ isAdmin = false }) => {
           </div>
           <div className="form-group">
             <label htmlFor="email">Email:</label>
-            <input type="email" id="email" name="email" value={editFormData.email} onChange={handleEditFormChange} required />
+            <input type="email" id="email" name="email" value={editFormData.email} onChange={handleEditFormChange} required disabled />
           </div>
           <div className="form-group">
             <label htmlFor="nic">NIC Number:</label>
-            <input type="text" id="nic" name="nic" value={editFormData.nic} onChange={handleEditFormChange} required />
+            <input type="text" id="nic" name="nic" value={editFormData.nic} onChange={handleEditFormChange} required disabled />
           </div>
           <div className="form-group">
             <label htmlFor="mobile">Mobile Number:</label>
@@ -301,7 +301,7 @@ const ProfilePage = ({ isAdmin = false }) => {
             <div className="form-group">
               <label htmlFor="indexNumber">Index Number:</label>
               <input type="text" id="indexNumber" name="indexNumber"
-                value={editFormData.indexNumber} onChange={handleEditFormChange} required />
+                value={editFormData.indexNumber} onChange={handleEditFormChange} required disabled />
             </div>
           )}
           {error && <p className="profile-error">{error}</p>}

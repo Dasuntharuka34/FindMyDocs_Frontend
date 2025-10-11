@@ -76,36 +76,46 @@ const DocumentsView = () => {
 
         setDocument(fetchedLetter);
 
-        // Generate history for all Letter types (including Medical Certificates)
+        // Generate history from approvals array
         const generatedHistory = [];
+        
+        // Add initial submission
         generatedHistory.push({
-            stage: 0,
-            status: approvalStages[0].name,
-            timestamp: fetchedLetter.submittedDate,
-            updatedBy: fetchedLetter.student,
-            comments: 'Initial submission'
+          stage: 0,
+          status: "Submitted",
+          timestamp: fetchedLetter.submittedDate,
+          updatedBy: fetchedLetter.student,
+          comments: 'Initial submission'
         });
-        if (fetchedLetter.currentStageIndex > 0) {
-            const currentStatusStage = approvalStages[fetchedLetter.currentStageIndex];
-            if (currentStatusStage) {
-                let comments = 'Status updated';
-                if (currentStatusStage.name === approvalStages[approvalStages.findIndex(s => s.name === "Rejected")]?.name) {
-                    comments = `Rejected: ${fetchedLetter.rejectionReason || 'No specific reason provided.'}`;
-                } else if (currentStatusStage.name === approvalStages[approvalStages.findIndex(s => s.name === "Approved")]?.name) {
-                    comments = 'Final approval received';
-                } else {
-                    comments = `Pending approval from ${currentStatusStage.approverRole}`;
-                }
-                generatedHistory.push({
-                    stage: fetchedLetter.currentStageIndex,
-                    status: fetchedLetter.status,
-                    timestamp: fetchedLetter.lastUpdated || fetchedLetter.submittedDate,
-                    updatedBy: fetchedLetter.approver || 'System',
-                    comments: comments
-                });
+
+        // Add approval stages
+        if (fetchedLetter.approvals && fetchedLetter.approvals.length > 0) {
+          fetchedLetter.approvals.forEach((approval, index) => {
+            let status, comments;
+            switch (approval.status) {
+              case 'approved':
+                status = 'Approved';
+                comments = `Approved by ${approval.approverRole}`;
+                break;
+              case 'rejected':
+                status = 'Rejected';
+                comments = `Rejected by ${approval.approverRole}`;
+                break;
+              default:
+                status = 'Pending';
+                comments = `Pending approval from ${approval.approverRole}`;
             }
+
+            generatedHistory.push({
+              stage: index + 1,
+              status: status,
+              timestamp: approval.approvedAt || new Date(),
+              updatedBy: approval.approverName || approval.approverRole || 'System',
+              comments: approval.comment || comments
+            });
+          });
         }
-        setHistory(generatedHistory);
+        setHistory(generatedHistory.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)));
         setLoading(false);
 
       } catch (err) {

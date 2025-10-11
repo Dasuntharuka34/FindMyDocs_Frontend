@@ -88,21 +88,31 @@ const ExcuseRequestView = () => {
           comments: 'Initial submission'
         });
 
-        // Add approval stages - FILTER OUT PENDING APPROVALS
+        // Add approval stages
         if (fetchedRequest.approvals && fetchedRequest.approvals.length > 0) {
           fetchedRequest.approvals.forEach((approval, index) => {
-            if (approval.status !== 'pending') {
-              generatedHistory.push({
-                stage: index + 1,
-                status: approval.status === 'approved' ? 'Approved' : 'Rejected',
-                timestamp: approval.approvedAt || fetchedRequest.submittedDate,
-                // Use approverName if available, otherwise fall back to approverRole
-                updatedBy: approval.approverName || approval.approverRole || 'System',
-                comments: approval.comment || (approval.status === 'approved' 
-                  ? `Approved by ${approval.approverRole}` 
-                  : `Rejected by ${approval.approverRole}`)
-              });
+            let status, comments;
+            switch (approval.status) {
+              case 'approved':
+                status = 'Approved';
+                comments = `Approved by ${approval.approverRole}`;
+                break;
+              case 'rejected':
+                status = 'Rejected';
+                comments = `Rejected by ${approval.approverRole}`;
+                break;
+              default:
+                status = 'Pending';
+                comments = `Pending approval from ${approval.approverRole}`;
             }
+
+            generatedHistory.push({
+              stage: index + 1,
+              status: status,
+              timestamp: approval.approvedAt || new Date(),
+              updatedBy: approval.approverName || approval.approverRole || 'System',
+              comments: approval.comment || comments
+            });
           });
         }
 

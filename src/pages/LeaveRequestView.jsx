@@ -127,20 +127,30 @@ const LeaveRequestView = () => {
     );
   }
 
-  // Filter out pending approvals and use approver name instead of role
-    const history = leaveRequest?.approvals
-    .filter(approval => approval.status !== 'pending')
+  // Map approvals to history, including pending
+  const history = leaveRequest?.approvals
     .map(approval => {
-        return {
+      let status, comments;
+      switch (approval.status) {
+        case 'approved':
+          status = 'Approved';
+          comments = `Approved by ${approval.approverRole}`;
+          break;
+        case 'rejected':
+          status = 'Rejected';
+          comments = `Rejected by ${approval.approverRole}`;
+          break;
+        default:
+          status = 'Pending';
+          comments = `Pending approval from ${approval.approverRole}`;
+      }
+      return {
         stage: approvalStages.findIndex(stage => stage.approverRole === approval.approverRole),
-        status: approval.status,
-        timestamp: approval.approvedAt || leaveRequest.submittedDate,
-        // Use approverName if available, otherwise fall back to approverRole
+        status: status,
+        timestamp: approval.approvedAt || new Date(),
         updatedBy: approval.approverName || approval.approverRole || 'System',
-        comments: approval.comment || (approval.status === 'approved' 
-            ? `Approved by ${approval.approverRole}` 
-            : `Rejected by ${approval.approverRole}`)
-        };
+        comments: approval.comment || comments
+      };
     }) || [];
 
     // Add initial submission to history
