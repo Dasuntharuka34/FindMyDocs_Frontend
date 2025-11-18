@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import ProgressTracker from '../components/ProgressTracker';
-import '../styles/pages/DocumentsView.css';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import Sidebar from '../components/Sidebar';
 import { AuthContext } from '../context/AuthContext';
+import '../styles/pages/ExcuseRequestView.css';
 
 // --- APPROVAL STAGE DEFINITIONS ---
 const approvalStages = [
@@ -84,46 +81,19 @@ const LeaveRequestView = () => {
 
   if (loading) {
     return (
-      <div className="documents-view-container">
-        <Header user={user} />
-        <div className="documents-layout">
-          <Sidebar />
-          <main className="documents-main-content">
-            <p style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem'}}>Loading leave request details...</p>
-          </main>
-        </div>
-        <Footer />
-      </div>
+      <p style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem'}}>Loading leave request details...</p>
     );
   }
 
   if (error) {
     return (
-      <div className="documents-view-container">
-        <Header user={user} />
-        <div className="documents-layout">
-          <Sidebar />
-          <main className="documents-main-content">
-            <div className="error-message" style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>{error}</div>
-          </main>
-        </div>
-        <Footer />
-      </div>
+      <div className="error-message" style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>{error}</div>
     );
   }
 
   if (!leaveRequest) {
     return (
-      <div className="documents-view-container">
-        <Header user={user} />
-        <div className="documents-layout">
-          <Sidebar />
-          <main className="documents-main-content">
-            <div className="error-message" style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>Leave request not found.</div>
-          </main>
-        </div>
-        <Footer />
-      </div>
+      <div className="error-message" style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>Leave request not found.</div>
     );
   }
 
@@ -165,74 +135,65 @@ const LeaveRequestView = () => {
     }
   
   return (
-    <div className="documents-view-container">
-      <Header user={user} />
-      <div className="documents-layout">
-        <Sidebar />
-        <main className="documents-main-content">
-          <div className="document-container">
-            <div className="document-header-row">
-              <h1>Leave Request Details</h1>
-            </div>
-            
-            <div className="document-info">
-              <p><strong>Request ID:</strong> {leaveRequest._id}</p>
-              <p><strong>Current Status:</strong> {leaveRequest.status}</p>
-              <p><strong>Submitted By:</strong> {leaveRequest.studentName}</p>
-              <p><strong>Submitted Date:</strong> {new Date(leaveRequest.submittedDate).toLocaleString()}</p>
-              <p><strong>Reason for Leave:</strong> {leaveRequest.reason}</p>
-              <p><strong>Reason Details:</strong> {leaveRequest.reasonDetails}</p>
-              <p><strong>Leave Period:</strong> {new Date(leaveRequest.startDate).toLocaleDateString()} to {new Date(leaveRequest.endDate).toLocaleDateString()}</p>
-              <p><strong>Contact during Leave:</strong> {leaveRequest.contactDuringLeave}</p>
-              <p><strong>Remarks:</strong> {leaveRequest.remarks || 'N/A'}</p>
-              
-              {leaveRequest.attachments && (
-                <p>
-                  <strong>Attachments:</strong> {' '}
-                  <a href={`${process.env.REACT_APP_BACKEND_URL}/${leaveRequest.attachments}`} target="_blank" rel="noopener noreferrer">
-                    View Attachment
-                  </a>
-                </p>
-              )}
-            </div>
-
-            <div className="progress-section">
-              <h3>Approval Progress</h3>
-              <ProgressTracker 
-                stages={approvalStages.map(s => s.name)}
-                currentStage={leaveRequest.currentStageIndex}
-              />
-            </div>
-
-            <div className="history-section">
-              <h3>Approval History</h3>
-              {history.length <= 1 ? (
-                <p>No detailed history available for this leave request.</p>
-              ) : (
-                <div className="history-table">
-                  <div className="history-header">
-                    <div>Stage</div>
-                    <div>Status</div>
-                    <div>Date & Time</div>
-                    <div>Updated By</div>
-                    <div>Comments</div>
-                  </div>
-                  {history.map((item, index) => (
-                    <div key={index} className="history-row">
-                      <div>{item.stage === 0 ? 'Submitted' : approvalStages[item.stage]?.name || `Stage ${item.stage}`}</div>
-                      <div>{item.status}</div>
-                      <div>{new Date(item.timestamp).toLocaleString()}</div>
-                      <div>{item.updatedBy}</div>
-                      <div>{item.comments}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </main>
+    <div className="document-container">
+      <div className="document-header-row">
+        <h1>Leave Request Details</h1>
       </div>
-      <Footer />
+      
+      <div className="document-info">
+        <p><strong>Request ID:</strong> {leaveRequest._id}</p>
+        <p><strong>Current Status:</strong> {leaveRequest.status}</p>
+        <p><strong>Submitted By:</strong> {leaveRequest.studentName}</p>
+        <p><strong>Submitted Date:</strong> {new Date(leaveRequest.submittedDate).toLocaleString()}</p>
+        <p><strong>Reason for Leave:</strong> {leaveRequest.reason}</p>
+        <p><strong>Reason Details:</strong> {leaveRequest.reasonDetails}</p>
+        <p><strong>Leave Period:</strong> {new Date(leaveRequest.startDate).toLocaleDateString()} to {new Date(leaveRequest.endDate).toLocaleDateString()}</p>
+        <p><strong>Contact during Leave:</strong> {leaveRequest.contactDuringLeave}</p>
+        <p><strong>Remarks:</strong> {leaveRequest.remarks || 'N/A'}</p>
+        
+        {leaveRequest.attachments && (
+          <p>
+            <strong>Attachments:</strong> {' '}
+            <a href={`${process.env.REACT_APP_BACKEND_URL}/${leaveRequest.attachments}`} target="_blank" rel="noopener noreferrer">
+              View Attachment
+            </a>
+          </p>
+        )}
+      </div>
+
+      <div className="progress-section">
+        <h3>Approval Progress</h3>
+        <ProgressTracker 
+          stages={approvalStages.map(s => s.name)}
+          currentStage={leaveRequest.currentStageIndex}
+        />
+      </div>
+
+      <div className="history-section">
+        <h3>Approval History</h3>
+        {history.length <= 1 ? (
+          <p>No detailed history available for this leave request.</p>
+        ) : (
+          <div className="history-table">
+            <div className="history-header">
+              <div>Stage</div>
+              <div>Status</div>
+              <div>Date & Time</div>
+              <div>Updated By</div>
+              <div>Comments</div>
+            </div>
+            {history.map((item, index) => (
+              <div key={index} className="history-row">
+                <div>{item.stage === 0 ? 'Submitted' : approvalStages[item.stage]?.name || `Stage ${item.stage}`}</div>
+                <div>{item.status}</div>
+                <div>{new Date(item.timestamp).toLocaleString()}</div>
+                <div>{item.updatedBy}</div>
+                <div>{item.comments}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

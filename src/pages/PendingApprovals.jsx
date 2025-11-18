@@ -247,9 +247,7 @@ function PendingApprovals() {
 
   return (
     <div className="pending-approvals-container">
-      <Header user={user} />
       <div className="approvals-layout">
-        <Sidebar />
         <div className="approvals-content">
           <h2>Pending Approvals</h2>
 

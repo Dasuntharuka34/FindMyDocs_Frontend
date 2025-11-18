@@ -10,7 +10,7 @@
   margin-top: 20px;
 }
 .letter-contenter{
-    padding: 10px;
+    /* padding: 10px; */
     width: 170vh;
     
 }
@@ -181,4 +181,10 @@
     color: #1a3e72;
     content: attr(data-label);
   }
+}
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
 }

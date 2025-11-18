@@ -1,0 +1,138 @@
+/* Base container and layout styles */
+.approved-requests-container {
+  width: 100%;
+  height: 100%;
+}
+
+.approved-requests-layout {
+  display: flex;
+  height: 90%;
+}
+
+.approved-requests-content {
+  flex: 1;
+  padding: 20px;
+}
+
+/* Style for each request section (Excuse and Leave) */
+.requests-section {
+  margin-bottom: 30px; /* Provides space between the two tables */
+}
+
+/* Table styling, copied from MyLettersPage for consistency */
+.requests-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.requests-table th,
+.requests-table td {
+  border: 1px solid #e0e0e0;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.requests-table th {
+  background-color: var(--thead-bg);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.requests-table tbody tr:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* Status badge styling */
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  color: white;
+  background-color: #787b7e; /* Default gray */
+}
+
+.status-badge.pending,
+.status-badge.pending-lecturer-approval,
+.status-badge.pending-hod-approval,
+.status-badge.pending-dean-approval,
+.status-badge.pending-vc-approval {
+  background-color: orange;
+}
+
+.status-badge.approved {
+  background-color: green;
+}
+
+.status-badge.rejected {
+  background-color: red;
+}
+
+/* "View Details" button style (already consistent) */
+.view-details-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: 0.9rem;
+  display: inline-block;
+  text-align: center;
+}
+
+.view-details-btn:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+/* --- Responsive Styles (for mobile) --- */
+@media (max-width: 768px) {
+  .requests-table th,
+  .requests-table td {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .requests-table {
+    border: none;
+  }
+
+  .requests-table thead {
+    display: none; /* Hide header on mobile */
+  }
+
+  .requests-table tr {
+    border: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+    display: block;
+    background-color: #fff;
+  }
+
+  .requests-table td {
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+    position: relative;
+    padding-left: 50%;
+    text-align: right;
+    display: block;
+    font-size: 0.9rem;
+  }
+
+  .requests-table td:before {
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: 600;
+    color: #1a3e72;
+    content: attr(data-label);
+  }
+}

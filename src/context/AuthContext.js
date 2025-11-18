@@ -8,8 +8,8 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
+    const storedToken = sessionStorage.getItem('token');
+    const storedUser = sessionStorage.getItem('user');
 
     if (storedToken && storedUser) {
       try {
@@ -24,18 +24,18 @@ export const AuthProvider = ({ children }) => {
           setUser(parsedUser);
           setIsLoggedIn(true);
         } else {
-          // If localStorage contains non-object data (like a plain string '123'), clear it
-          console.warn("Invalid user data found in localStorage. Clearing...");
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
+          // If sessionStorage contains non-object data (like a plain string '123'), clear it
+          console.warn("Invalid user data found in sessionStorage. Clearing...");
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
           setUser(null);
           setIsLoggedIn(false);
         }
         // --- FIX END ---
       } catch (error) {
-        console.error("Failed to parse user from localStorage", error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        console.error("Failed to parse user from sessionStorage", error);
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
       }
     }
   }, []);
@@ -50,15 +50,15 @@ export const AuthProvider = ({ children }) => {
       }
       setUser(fetchedUser);
       setIsLoggedIn(true);
-      localStorage.setItem('token', fetchedToken);
-      localStorage.setItem('user', JSON.stringify(fetchedUser));
+      sessionStorage.setItem('token', fetchedToken);
+      sessionStorage.setItem('user', JSON.stringify(fetchedUser));
     } else {
       console.error("Login received non-object user data:", fetchedUser);
       // Fallback: Clear any potentially corrupt data
       setUser(null);
       setIsLoggedIn(false);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
       throw new Error("Invalid user data received from login. Please try again."); // Re-throw to handle in LoginPage
     }
     // --- FIX END ---
@@ -69,11 +69,11 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setUser(null);
     setIsLoggedIn(false);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
   };
 
-  // Function to update user data in context and localStorage
+  // Function to update user data in context and sessionStorage
   const updateUser = (updatedUserData) => {
     setUser(prevUser => {
       // Ensure prevUser is an object before spreading its properties
@@ -92,18 +92,18 @@ export const AuthProvider = ({ children }) => {
       return newUserState;
     });
 
-    const currentLocalStorageUser = JSON.parse(localStorage.getItem('user'));
-    // Ensure currentLocalStorageUser is an object before spreading its properties
-    const parsedLocalStorageUser = (typeof currentLocalStorageUser === 'object' && currentLocalStorageUser !== null) ? currentLocalStorageUser : {};
+    const currentsessionStorageUser = JSON.parse(sessionStorage.getItem('user'));
+    // Ensure currentsessionStorageUser is an object before spreading its properties
+    const parsedsessionStorageUser = (typeof currentsessionStorageUser === 'object' && currentsessionStorageUser !== null) ? currentsessionStorageUser : {};
 
-    const newLocalStorageUser = {
-        ...parsedLocalStorageUser,
+    const newsessionStorageUser = {
+        ...parsedsessionStorageUser,
         ...updatedUserData
     };
-    if (updatedUserData.profilePicture === undefined && parsedLocalStorageUser.profilePicture) {
-        newLocalStorageUser.profilePicture = parsedLocalStorageUser.profilePicture;
+    if (updatedUserData.profilePicture === undefined && parsedsessionStorageUser.profilePicture) {
+        newsessionStorageUser.profilePicture = parsedsessionStorageUser.profilePicture;
     }
-    localStorage.setItem('user', JSON.stringify(newLocalStorageUser));
+    sessionStorage.setItem('user', JSON.stringify(newsessionStorageUser));
   };
 
   const authContextValue = {

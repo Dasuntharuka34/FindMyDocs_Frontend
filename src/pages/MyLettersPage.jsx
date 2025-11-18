@@ -93,13 +93,22 @@ function MyLettersPage() {
   }, [user, token]); // Add token to dependency array
 
   if (loading) {
-    return <p style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem'}}>Loading your requests...</p>;
+    return (
+      <div className="dashboard-container">
+        <div className="approvals-layout">
+          <main className="letter-content">
+          <div className="letter-contenter">
+            <div className="loading">Loading your requests...</div>
+            </div>
+          </main>
+        </div>
+        <Footer />
+      </div>
+    );
   }
 
   return (
     <div className="dashboard-container">
-      <Header user={user} />
-      <Sidebar />
       <div className="approvals-layout">
         <main className="letter-content">
           <div className="letter-contenter">

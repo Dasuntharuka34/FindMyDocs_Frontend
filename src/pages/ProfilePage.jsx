@@ -374,9 +374,7 @@ const ProfilePage = ({ isAdmin = false }) => {
   } else {
     return (
       <div className="profile-container">
-        <Header user={user} />
         <div className="profile-layout">
-          <Sidebar />
           <main className="profile-content">
             {profileContent}
           </main>

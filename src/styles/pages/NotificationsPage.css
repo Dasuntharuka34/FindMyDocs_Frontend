@@ -1,12 +1,5 @@
 /* NotificationsPage.css */
 .notifications-page-container {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  grid-template-rows: 60px 1fr 40px;
-  grid-template-areas:
-    "header header"
-    "sidebar main"
-    "footer footer";
   min-height: 100vh;
   width: 100%;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

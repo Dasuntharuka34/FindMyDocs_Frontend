@@ -17,6 +17,7 @@ import LeaveRequestForm from './forms/LeaveRequestForm';
 import LeaveRequestView from './pages/LeaveRequestView';
 import NotificationsPage from './pages/NotificationsPage';
 import AdminLayout from './layouts/AdminLayout';
+import UserLayout from './layouts/UserLayout';
 import RegistrationApprovalPage from './pages/admin/RegistrationApprovalPage';
 import UserManagementPage from './pages/admin/UserManagementPage';
 import AllRequestsPage from './pages/admin/AllRequestsPage';
@@ -28,7 +29,9 @@ import EditFormPage from './pages/admin/EditFormPage';
 import AvailableFormsPage from './pages/AvailableFormsPage';
 import RenderFormPage from './pages/RenderFormPage';
 import MySubmissionsPage from './pages/MySubmissionsPage';
+import ContactSupportPage from './pages/ContactSupportPage';
 import { ThemeProvider } from './context/ThemeContext';
+import AutoLogout from './components/AutoLogout';
 
 
 // PrivateRoute component (fixed)
@@ -51,7 +54,7 @@ function App() {
 
   return (
     <Router>
-      
+      <AutoLogout />
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={isLoggedIn ? <Navigate to={user?.role === 'Admin' ? "/admin-dashboard" : "/dashboard"} /> : <LoginPage />} />
@@ -63,7 +66,9 @@ function App() {
         {/* Protected Routes */}
         <Route path="/dashboard" element={
           <PrivateRoute allowedRoles={['Student','Lecturer', 'HOD', 'Dean', 'VC']}>
-            <Dashboard />
+            <UserLayout>
+              <Dashboard />
+            </UserLayout>
           </PrivateRoute>
         } />
 
@@ -141,62 +146,100 @@ function App() {
 
         <Route path="/pending-approvals" element={
           <PrivateRoute allowedRoles={['Lecturer', 'HOD', 'Dean', 'VC']}>
-            <PendingApprovals />
+            <UserLayout>
+              <PendingApprovals />
+            </UserLayout>
           </PrivateRoute>
         } />
 
         <Route path="/excuse-request" element={
           <PrivateRoute allowedRoles={['Student','Lecturer', 'HOD', 'Dean', 'VC']}>
-            <ExcuseRequestForm />
+            <UserLayout>
+              <ExcuseRequestForm />
+            </UserLayout>
           </PrivateRoute>
         } />
 
         <Route path="/leave-request" element={
           <PrivateRoute allowedRoles={['Lecturer', 'HOD', 'Dean', 'VC']}>
-            <LeaveRequestForm />
+            <UserLayout>
+              <LeaveRequestForm />
+            </UserLayout>
           </PrivateRoute>
         } />
 
         <Route path="/my-letters" element={
           <PrivateRoute allowedRoles={['Student','Lecturer', 'HOD', 'Dean', 'VC']}>
-            <MyLettersPage />
+            <UserLayout>
+              <MyLettersPage />
+            </UserLayout>
           </PrivateRoute>
         } />
 
         <Route path="/available-forms" element={
           <PrivateRoute allowedRoles={['Student','Lecturer', 'HOD', 'Dean', 'VC']}>
-            <AvailableFormsPage />
+            <UserLayout>
+              <AvailableFormsPage />
+            </UserLayout>
           </PrivateRoute>
         } />
 
         <Route path="/fill-form/:id" element={
           <PrivateRoute allowedRoles={['Student','Lecturer', 'HOD', 'Dean', 'VC']}>
-            <RenderFormPage />
+            <UserLayout>
+              <RenderFormPage />
+            </UserLayout>
           </PrivateRoute>
         } />
 
         <Route path="/documents/:id" element={
           <PrivateRoute allowedRoles={['Student', 'Lecturer', 'HOD', 'Dean', 'VC', 'Admin']}>
-            <DocumentsView />
+            {user?.role === 'Admin' ? (
+              <AdminLayout>
+                <DocumentsView />
+              </AdminLayout>
+            ) : (
+              <UserLayout>
+                <DocumentsView />
+              </UserLayout>
+            )}
           </PrivateRoute>
         } />
 
         <Route path="/excuse-request/:id" element={
           <PrivateRoute allowedRoles={['Student', 'Lecturer', 'HOD', 'Dean', 'VC', 'Admin']}>
-            <ExcuseRequestView />
+            {user?.role === 'Admin' ? (
+              <AdminLayout>
+                <ExcuseRequestView />
+              </AdminLayout>
+            ) : (
+              <UserLayout>
+                <ExcuseRequestView />
+              </UserLayout>
+            )}
           </PrivateRoute>
         } />
 
         {/* Fixed: Consistent route pattern */}
         <Route path="/leave-request/:id" element={
           <PrivateRoute allowedRoles={['Student', 'Lecturer', 'HOD', 'Dean', 'VC', 'Admin']}>
-            <LeaveRequestView />
+            {user?.role === 'Admin' ? (
+              <AdminLayout>
+                <LeaveRequestView />
+              </AdminLayout>
+            ) : (
+              <UserLayout>
+                <LeaveRequestView />
+              </UserLayout>
+            )}
           </PrivateRoute>
         } />
 
         <Route path="/notifications" element={
           <PrivateRoute allowedRoles={['Student', 'Lecturer', 'HOD', 'Dean', 'VC', 'Admin']}>
-           <NotificationsPage />
+            <UserLayout>
+              <NotificationsPage />
+            </UserLayout>
           </PrivateRoute>
         } />
 
@@ -208,10 +251,14 @@ function App() {
                 <ProfilePage isAdmin={true} />
               </AdminLayout>
             ) : (
-              <ProfilePage />
+              <UserLayout>
+                <ProfilePage />
+              </UserLayout>
             )}
           </PrivateRoute>
         } />
+
+        <Route path="/contact-support" element={<ContactSupportPage />} />
 
         {/* Catch-all route for 404 - Not Found */}
         <Route path="*" element={<p style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem'}}>404 - Page Not Found</p>} />

@@ -1,19 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import ProgressTracker from '../components/ProgressTracker';
-import '../styles/pages/ExcuseRequestView.css';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import Sidebar from '../components/Sidebar';
 import { AuthContext } from '../context/AuthContext';
-
+import '../styles/pages/ExcuseRequestView.css';
 // --- APPROVAL STAGE DEFINITIONS (MUST BE CONSISTENT WITH BACKEND) ---
 const approvalStages = [
   { name: "Submitted", approverRole: null },
   { name: "Pending Lecturer Approval", approverRole: "Lecturer" },
   { name: "Pending HOD Approval", approverRole: "HOD" },
   { name: "Pending Dean Approval", approverRole: "Dean" },
-  { name: "Pending VC Approval", approverRole: "VC" },
   { name: "Approved", approverRole: null }
 ];
 // --- END APPROVAL STAGE DEFINITIONS ---
@@ -143,178 +138,142 @@ const ExcuseRequestView = () => {
 
   if (loading) {
     return (
-      <div className="excuse-request-view-container">
-        <Header user={user} />
-        <div className="excuse-request-layout">
-          <Sidebar />
-          <main className="excuse-request-main-content">
-            <p style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem'}}>Loading excuse request details...</p>
-          </main>
-        </div>
-        <Footer />
-      </div>
+      <p style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem'}}>Loading excuse request details...</p>
     );
   }
 
   if (error) {
     return (
-      <div className="excuse-request-view-container">
-        <Header user={user} />
-        <div className="excuse-request-layout">
-          <Sidebar />
-          <main className="excuse-request-main-content">
-            <div className="error-message" style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>{error}</div>
-          </main>
-        </div>
-        <Footer />
-      </div>
+      <div className="error-message" style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>{error}</div>
     );
   }
 
   if (!excuseRequest) {
     return (
-      <div className="excuse-request-view-container">
-        <Header user={user} />
-        <div className="excuse-request-layout">
-          <Sidebar />
-          <main className="excuse-request-main-content">
-            <div className="error-message" style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>Excuse request not found.</div>
-          </main>
-        </div>
-        <Footer />
-      </div>
+      <div className="error-message" style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>Excuse request not found.</div>
     );
   }
 
   return (
-    <div className="excuse-request-view-container">
-      <Header user={user} />
-      <div className="excuse-request-layout">
-        <Sidebar />
-        <main className="excuse-request-main-content">
-          <div className="excuse-request-container">
-            <div className="excuse-request-header-row">
-              <h1>Excuse Request Details</h1>
-            </div>
-            
-            <div className="excuse-request-info">
-              <h3>Basic Information</h3>
-              <div className="info-grid">
-                <div className="info-item">
-                  <strong>Request ID:</strong> {excuseRequest._id}
-                </div>
-                <div className="info-item">
-                  <strong>Current Status:</strong> {excuseRequest.status}
-                </div>
-                <div className="info-item">
-                  <strong>Student Name:</strong> {excuseRequest.studentName}
-                </div>
-                <div className="info-item">
-                  <strong>Registration No:</strong> {excuseRequest.regNo}
-                </div>
-                <div className="info-item">
-                  <strong>Email:</strong> {excuseRequest.email}
-                </div>
-                <div className="info-item">
-                  <strong>Mobile:</strong> {excuseRequest.mobile}
-                </div>
-                <div className="info-item">
-                  <strong>Address:</strong> {excuseRequest.address}
-                </div>
-                <div className="info-item">
-                  <strong>Level of Study:</strong> {excuseRequest.levelOfStudy}
-                </div>
-                <div className="info-item">
-                  <strong>Subject Combination:</strong> {excuseRequest.subjectCombo}
-                </div>
-                <div className="info-item">
-                  <strong>Submitted Date:</strong> {new Date(excuseRequest.submittedDate).toLocaleString()}
-                </div>
-              </div>
-
-              <h3>Absence Details</h3>
-              <div className="info-grid">
-                <div className="info-item full-width">
-                  <strong>Reason for Absence:</strong> {excuseRequest.reason}
-                </div>
-                <div className="info-item full-width">
-                  <strong>Reason Details:</strong> {excuseRequest.reasonDetails}
-                </div>
-                <div className="info-item full-width">
-                  <strong>Lectures Missed:</strong> {excuseRequest.lectureAbsents}
-                </div>
-              </div>
-
-              {excuseRequest.absences && excuseRequest.absences.length > 0 && (
-                <>
-                  <h3>Periods of Absence</h3>
-                  <div className="absences-table">
-                    <div className="absences-header">
-                      <div>Course Code</div>
-                      <div>Date</div>
-                    </div>
-                    {excuseRequest.absences.map((absence, idx) => (
-                      <div key={idx} className="absences-row">
-                        <div>{absence.courseCode}</div>
-                        <div>{absence.date}</div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {excuseRequest.attachments && (
-                <div className="info-item full-width">
-                  <strong>Medical Form:</strong>{' '}
-                  <a
-                    href={`${excuseRequest.attachments}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View Medical Form
-                  </a>
-                </div>
-              )}
-            </div>
-
-            <div className="progress-section">
-              <h3>Approval Progress</h3>
-              <ProgressTracker
-                stages={approvalStages.map(s => s.name)}
-                currentStage={excuseRequest.currentStageIndex}
-                isRejected={excuseRequest.status === "Rejected"}
-              />
-            </div>
-
-            <div className="history-section">
-              <h3>Approval History</h3>
-              {history.length === 0 ? (
-                <p>No approval history available for this excuse request.</p>
-              ) : (
-                <div className="history-table">
-                  <div className="history-header">
-                    <div>Stage</div>
-                    <div>Status</div>
-                    <div>Date & Time</div>
-                    <div>Updated By</div>
-                    <div>Comments</div>
-                  </div>
-                  {history.map((item, index) => (
-                    <div key={index} className="history-row">
-                      <div>{item.stage === 0 ? 'Submitted' : approvalStages[item.stage]?.name || `Stage ${item.stage}`}</div>
-                      <div>{item.status}</div>
-                      <div>{new Date(item.timestamp).toLocaleString()}</div>
-                      <div>{item.updatedBy}</div>
-                      <div>{item.comments}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </main>
+    <div className="excuse-request-container">
+      <div className="excuse-request-header-row">
+        <h1>Excuse Request Details</h1>
       </div>
-      <Footer />
+      
+      <div className="excuse-request-info">
+        <h3>Basic Information</h3>
+        <div className="info-grid">
+          <div className="info-item">
+            <strong>Request ID:</strong> {excuseRequest._id}
+          </div>
+          <div className="info-item">
+            <strong>Current Status:</strong> {excuseRequest.status}
+          </div>
+          <div className="info-item">
+            <strong>Student Name:</strong> {excuseRequest.studentName}
+          </div>
+          <div className="info-item">
+            <strong>Registration No:</strong> {excuseRequest.regNo}
+          </div>
+          <div className="info-item">
+            <strong>Email:</strong> {excuseRequest.email}
+          </div>
+          <div className="info-item">
+            <strong>Mobile:</strong> {excuseRequest.mobile}
+          </div>
+          <div className="info-item">
+            <strong>Address:</strong> {excuseRequest.address}
+          </div>
+          <div className="info-item">
+            <strong>Level of Study:</strong> {excuseRequest.levelOfStudy}
+          </div>
+          <div className="info-item">
+            <strong>Subject Combination:</strong> {excuseRequest.subjectCombo}
+          </div>
+          <div className="info-item">
+            <strong>Submitted Date:</strong> {new Date(excuseRequest.submittedDate).toLocaleString()}
+          </div>
+        </div>
+
+        <h3>Absence Details</h3>
+        <div className="info-grid">
+          <div className="info-item full-width">
+            <strong>Reason for Absence:</strong> {excuseRequest.reason}
+          </div>
+          <div className="info-item full-width">
+            <strong>Reason Details:</strong> {excuseRequest.reasonDetails}
+          </div>
+          <div className="info-item full-width">
+            <strong>Lectures Missed:</strong> {excuseRequest.lectureAbsents}
+          </div>
+        </div>
+
+        {excuseRequest.absences && excuseRequest.absences.length > 0 && (
+          <>
+            <h3>Periods of Absence</h3>
+            <div className="absences-table">
+              <div className="absences-header">
+                <div>Course Code</div>
+                <div>Date</div>
+              </div>
+              {excuseRequest.absences.map((absence, idx) => (
+                <div key={idx} className="absences-row">
+                  <div>{absence.courseCode}</div>
+                  <div>{absence.date}</div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {excuseRequest.attachments && (
+          <div className="info-item full-width">
+            <strong>Medical Form:</strong>{' '}
+            <a
+              href={`${excuseRequest.attachments}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Medical Form
+            </a>
+          </div>
+        )}
+      </div>
+
+      <div className="progress-section">
+        <h3>Approval Progress</h3>
+        <ProgressTracker
+          stages={approvalStages.map(s => s.name)}
+          currentStage={excuseRequest.currentStageIndex}
+          isRejected={excuseRequest.status === "Rejected"}
+        />
+      </div>
+
+      <div className="history-section">
+        <h3>Approval History</h3>
+        {history.length === 0 ? (
+          <p>No approval history available for this excuse request.</p>
+        ) : (
+          <div className="history-table">
+            <div className="history-header">
+              <div>Stage</div>
+              <div>Status</div>
+              <div>Date & Time</div>
+              <div>Updated By</div>
+              <div>Comments</div>
+            </div>
+            {history.map((item, index) => (
+              <div key={index} className="history-row">
+                <div>{item.stage === 0 ? 'Submitted' : approvalStages[item.stage]?.name || `Stage ${item.stage}`}</div>
+                <div>{item.status}</div>
+                <div>{new Date(item.timestamp).toLocaleString()}</div>
+                <div>{item.updatedBy}</div>
+                <div>{item.comments}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

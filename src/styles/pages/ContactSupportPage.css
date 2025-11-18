@@ -1,0 +1,28 @@
+.contact-support-page {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.contact-support-page h1 {
+  font-size: 2em;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 10px;
+}
+
+.contact-support-page p {
+  font-size: 1.1em;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.contact-support-page ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.contact-support-page li {
+  font-size: 1.1em;
+  margin-bottom: 10px;
+}

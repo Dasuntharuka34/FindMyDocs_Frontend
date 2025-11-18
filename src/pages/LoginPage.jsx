@@ -9,7 +9,7 @@ import MessageModal from '../components/MessageModal';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
-    email: "",
+    nic: "",
     password: "",
   });
 
@@ -32,8 +32,8 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.email.trim() === "") { 
-      setError("Email cannot be empty");
+    if (formData.nic.trim() === "") { 
+      setError("NIC cannot be empty");
       return;
     }
     if (formData.password.trim() === "") { 
@@ -72,7 +72,7 @@ export default function LoginPage() {
             setMessageModal({ show: true, title: 'Error', message: 'Login successful, but user data invalid for navigation. Please contact support.', onConfirm: closeMessageModal });
         }
       } else {
-        setMessageModal({ show: true, title: 'Login Failed', message: data.message || 'Invalid email or password.' });
+        setMessageModal({ show: true, title: 'Login Failed', message: data.message || 'Invalid NIC or password.' });
         setError(data.message || 'Login failed.');
       }
     } catch (error) {
@@ -112,10 +112,10 @@ export default function LoginPage() {
           <div className="form-group">
           <input
             className="login-input"
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email} 
+            type="text"
+            name="nic"
+            placeholder="NIC Number"
+            value={formData.nic} 
             onChange={handleChange}
             required
           />

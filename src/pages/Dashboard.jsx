@@ -1,20 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
-import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
 import RecentLetters from '../components/RecentLetters';
 import NotificationsWidget from '../components/NotificationsWidget';
 import NewLetterModal from '../components/NewLetterModal';
-import Footer from '../components/Footer';
 import ExcuseRequestForm from '../forms/ExcuseRequestForm';
 import LeaveRequestForm from '../forms/LeaveRequestForm'; // Import the new component
-import '../styles/pages/Dashboard.css';
-import '../styles/components/ProgressTracker.css';
-import '../styles/components/RecentLetters.css';
-import '../styles/components/Notifications.css';
-import '../styles/components/NewLetterModal.css';
-import '../styles/components/Header.css';
-import '../styles/components/Footer.css';
-import '../styles/components/Sidebar.css';
 import { AuthContext } from '../context/AuthContext';
 import MessageModal from '../components/MessageModel';
 
@@ -206,35 +195,30 @@ function Dashboard() {
   }
 
   return (
-    <div className="dashboard-container">
-      <Header user={user} />
-      <Sidebar />
-      <main className="main-content">
-        <section className="top-widgets">
-          {/* <ProgressTracker stages={approvalStages.map(s => s.name)} currentStage={currentStage} /> */}
-          <NotificationsWidget 
-            notifications={notifications} 
-            onNotificationUpdate={fetchNotifications} 
-          />
-        </section>
+    <main className="main-content">
+      <section className="top-widgets">
+        {/* <ProgressTracker stages={approvalStages.map(s => s.name)} currentStage={currentStage} /> */}
+        <NotificationsWidget 
+          notifications={notifications} 
+          onNotificationUpdate={fetchNotifications} 
+        />
+      </section>
 
-        <section className="bottom-widgets">
-          <RecentLetters letters={letters} />
-          <div className="new-letter-button-container">
-            <button
-              className="new-letter-btn"
-              onClick={() => setModalOpen(true)}
-              aria-label="Submit a New Letter"
-            >
-              + Submit a New Letter
-            </button>
-          </div>
-        </section>
-      </main>
+      <section className="bottom-widgets">
+        <RecentLetters letters={letters} />
+        <div className="new-letter-button-container">
+          <button
+            className="new-letter-btn"
+            onClick={() => setModalOpen(true)}
+            aria-label="Submit a New Letter"
+          >
+            + Submit a New Letter
+          </button>
+        </div>
+      </section>
       {modalOpen && <NewLetterModal user={user} onClose={() => setModalOpen(false)} onSubmit={addLetter} />}
       {showExcuseRequestModal && <ExcuseRequestForm onClose={closeExcuseRequestFormModal} />}
       {showLeaveRequestModal && <LeaveRequestForm onClose={closeLeaveRequestFormModal} />} {/* Render the Leave Request Form */}
-      <Footer />
 
       <MessageModal
         show={messageModal.show}
@@ -242,7 +226,7 @@ function Dashboard() {
         message={messageModal.message}
         onConfirm={messageModal.onConfirm}
       />
-    </div>
+    </main>
   );
 }
 

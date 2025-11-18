@@ -10,7 +10,7 @@ root.render(
   <React.StrictMode>
     <ThemeProvider>
       <AuthProvider> 
-        <App />
+          <App />
       </AuthProvider>
     </ThemeProvider>
   </React.StrictMode>

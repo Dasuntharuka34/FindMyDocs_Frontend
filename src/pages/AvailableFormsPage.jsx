@@ -11,7 +11,7 @@ const AvailableFormsPage = () => {
   useEffect(() => {
     const fetchForms = async () => {
       try {
-        const response = await api.get('/forms');
+        const response = await api.get('/forms/available');
         setForms(response.data);
         setLoading(false);
       } catch (err) {

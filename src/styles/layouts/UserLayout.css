@@ -1,0 +1,30 @@
+.user-page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
+  
+  .user-content-wrapper {
+    display: flex;
+    flex: 1;
+  }
+  
+  .user-main-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto; /* Enable scrolling for main content */
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .user-content-wrapper {
+      flex-direction: column;
+    }
+  
+    .user-main-content {
+      padding: 10px;
+    }
+  }
+  

@@ -63,6 +63,18 @@
   color: white;
 }
 
+.manage-forms-page .toggle-btn {
+  color: white;
+}
+
+.manage-forms-page .enable-btn {
+  background-color: #28a745;
+}
+
+.manage-forms-page .disable-btn {
+  background-color: #ffc107;
+}
+
 @media (max-width: 768px) {
   .manage-forms-page table,
   .manage-forms-page thead,

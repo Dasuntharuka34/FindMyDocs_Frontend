@@ -175,8 +175,6 @@ const NotificationsPage = () => {
   if (isLoading) {
     return (
       <div className="notifications-page-container">
-        <Header user={user}/>
-        <Sidebar />
         <div className="notifications-page-content">
           <div className="loading">Loading notifications...</div>
         </div>
@@ -189,8 +187,6 @@ const NotificationsPage = () => {
 
   return (
     <div className="notifications-page-container">
-      <Header user={user}/>
-      <Sidebar />
       <div className="notifications-page-content">
         <div className="page-header">
           <h1>Notifications</h1>
