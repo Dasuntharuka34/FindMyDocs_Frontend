@@ -154,7 +154,7 @@ const LeaveRequestView = () => {
         {leaveRequest.attachments && (
           <p>
             <strong>Attachments:</strong> {' '}
-            <a href={`${process.env.REACT_APP_BACKEND_URL}/${leaveRequest.attachments}`} target="_blank" rel="noopener noreferrer">
+            <a href={`${leaveRequest.attachments}`} target="_blank" rel="noopener noreferrer">
               View Attachment
             </a>
           </p>

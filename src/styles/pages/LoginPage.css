@@ -1,6 +1,6 @@
 .login-page {
   height: 100vh;
-  background: url('../../assets/UOJ_login.jpg') no-repeat center center ;
+  background: url('../../assets/bg-01.jpg') no-repeat center center ;
   background-size: cover;
   display: flex;
   justify-content: center;

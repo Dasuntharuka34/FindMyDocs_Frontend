@@ -95,35 +95,16 @@ const LeaveRequestForm = () => {
 
 
     try {
-      let attachmentUrl = '';
-      if (leaveForm) {
-        // Upload the file to Vercel Blob via our API route
-        const uploadResponse = await fetch(`/api/upload?filename=${leaveForm.name}`, {
-          method: 'POST',
-          body: leaveForm,
-        });
-
-        if (!uploadResponse.ok) {
-          const errorText = await uploadResponse.text();
-          throw new Error(`Failed to upload attachment: ${errorText}`);
-        }
-
-        const blob = await uploadResponse.json();
-        attachmentUrl = blob.url;
-      }
-
       const formDataToSend = new FormData();
 
-      
       // Append all form data fields
-      // NOTE: This now correctly iterates over the state to append all fields
       for (const key in formData) {
         formDataToSend.append(key, formData[key]);
       }
       
-      // Append attachment URL if it exists
-      if (attachmentUrl) {
-        formDataToSend.append('attachment', attachmentUrl);
+      // Append the file directly if it exists
+      if (leaveForm) {
+        formDataToSend.append('leaveForm', leaveForm); // Key 'leaveForm' matches multer field name
       }
       
       // Append user details from AuthContext
@@ -191,7 +172,7 @@ const LeaveRequestForm = () => {
   return (
     <div className="leave-form-page-container">
       <form className="form-container" onSubmit={handleSubmit}>
-        <h2 className="form-title">Faculty of Science - University of Jaffna</h2>
+        <h2 className="form-title">Faculty of Science - School of Alchemist</h2>
         <p className="form-subtitle">Application for Leave</p>
 
         <p className="form-info">

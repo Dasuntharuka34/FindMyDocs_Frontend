@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
-import universityLogo from '../assets/uni-logo.png'; // Make sure this path is correct
+import universityLogo from '../assets/uoj.png'; // Make sure this path is correct
 import Footer from "../components/Footer"; // Make sure this path is correct
 import '../styles/pages/LoginPage.css'; // You'll need to create or update this CSS file
 import { AuthContext } from '../context/AuthContext'; // AuthContext for login functionality
@@ -99,11 +99,11 @@ export default function LoginPage() {
     <div className="login-page">
       <div className="login-container">
         <div className="login-box">
-        <h2>University Of Jaffna</h2>
+        <h2>School of Alchemist</h2>
         <div className="flex justify-center mb-6">
           <img
             src={universityLogo}
-            alt="University of Jaffna Logo"
+            alt="School of Alchemist Logo"
             className="login-logo"
           />
         </div>

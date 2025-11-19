@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
-import universityLogo from '../assets/uni-logo.png';
+import universityLogo from '../assets/uoj.png';
 import Footer from '../components/Footer';
 import '../styles/pages/RegisterPage.css';
 import MessageModal from '../components/MessageModal';
@@ -137,11 +137,11 @@ export default function RegisterPage() {
   return (
     <div className="registration-page">
       <div className="registration-container">
-        <div className="registration-title">University Of Jaffna</div>
+        <div className="registration-title">School of Alchemist</div>
         <div className="flex justify-center mb-4">
           <img
             src={universityLogo}
-            alt="University of Jaffna Logo"
+            alt="School of Alchemist Logo"
             className="registration-logo"
           />
         </div>

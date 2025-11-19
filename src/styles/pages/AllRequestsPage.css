@@ -1,0 +1,164 @@
+.all-requests-container {
+    padding: 20px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    min-height: calc(100vh - 60px); /* Adjust based on header/footer height */
+}
+
+.all-requests-container h1 {
+    color: var(--text-h2);
+}
+
+.requests-controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.search-input,
+.sort-select {
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--input-background);
+    color: var(--text-color);
+    font-size: 1em;
+    flex-grow: 1;
+    max-width: 300px;
+}
+
+.search-input::placeholder {
+    color: var(--text-color-secondary);
+}
+
+.sort-select {
+    cursor: pointer;
+    flex-grow: 0;
+    min-width: 180px;
+}
+
+.request-section {
+    background-color: var(--bg-secondary);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 6px rgb(0 0 0 / 0.1);
+    margin-bottom: 30px;
+}
+
+.request-section h2 {
+    color: var(--text-h2);
+}
+
+.requests-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.requests-table th,
+.requests-table td {
+    border: 1px solid var(--border-color);
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.requests-table th {
+    background-color: var(--table-header-background);
+    color: var(--table-header-text);
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+.requests-table tbody tr:nth-child(even) {
+    background-color: var(--table-row-even);
+}
+
+.requests-table tbody tr:hover {
+    background-color: var(--table-row-hover);
+}
+
+.view-button {
+    background-color: var(--button-primary-background);
+    color: var(--button-primary-text);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.view-button:hover {
+    background-color: var(--button-primary-hover);
+}
+
+.error-message {
+    color: var(--error-color);
+    text-align: center;
+    font-size: 1.2em;
+    margin-top: 50px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Status styles */
+.status-pending {
+    color: var(--warning-color, #ffc107); /* Default to yellow if variable not found */
+    font-weight: bold;
+}
+
+.status-approved {
+    color: var(--success-color, #28a745); /* Default to green if variable not found */
+    font-weight: bold;
+}
+
+.status-rejected {
+    color: var(--error-color, #dc3545); /* Default to red if variable not found */
+    font-weight: bold;
+}
+
+.status-default {
+    color: var(--text-color-secondary, #6c757d); /* Default to grey if variable not found */
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .all-requests-container {
+        padding: 15px;
+    }
+
+    .requests-table th,
+    .requests-table td {
+        padding: 8px 10px;
+        font-size: 0.85em;
+    }
+
+    .view-button {
+        padding: 6px 10px;
+        font-size: 0.8em;
+    }
+
+    .requests-controls {
+        justify-content: center;
+    }
+
+    .search-input,
+    .sort-select {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .all-requests-container h1 {
+        font-size: 1.8em;
+    }
+
+    .request-section h2 {
+        font-size: 1.3em;
+    }
+}

@@ -23,7 +23,10 @@
           color: var(--text-secondary);
           font-size: 1rem;
         }
-
+        option {
+          color: var(--text-primary);
+          background-color: var(--bg-primary);
+      }
         /* Form Grid Layout for better organization */
         .form-grid {
           display: grid;

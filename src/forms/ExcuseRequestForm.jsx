@@ -200,7 +200,7 @@ const ExcuseRequestForm = () => {
 
   return (
     <div className="excuse-form-container">
-      <h2 className="form-title">Faculty of Science - University of Jaffna</h2>
+      <h2 className="form-title">Faculty of Science - School of Alchemist</h2>
       <p className="form-subtitle">Application to Excuse Academic Absence</p>
 
       <form onSubmit={handleSubmit} className="form-grid">

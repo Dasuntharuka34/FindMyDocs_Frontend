@@ -16,10 +16,15 @@
 
 /* Style for each request section (Excuse and Leave) */
 .approvals-section {
+  background-color: var(--bg-secondary);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 6px rgb(0 0 0 / 0.1);
   margin-bottom: 30px; /* Provides space between the two tables */
 }
-
-
+h2 {
+  color: var(--text-h2);
+}
 /* Table styling, copied from MyLettersPage for consistency */
 .approvals-table {
   width: 100%;

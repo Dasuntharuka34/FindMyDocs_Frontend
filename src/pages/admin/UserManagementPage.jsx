@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-
 import { AuthContext } from '../../context/AuthContext';
+import { useRequestFilters } from '../../hooks/useRequestFilters';
 
 const MessageModal = ({ show, title, message, onConfirm, onCancel }) => {
   if (!show) return null;
@@ -36,6 +36,17 @@ export default function UserManagementPage() {
   const { user, token } = useContext(AuthContext);
   const [approvedUsers, setApprovedUsers] = useState([]);
   const [messageModal, setMessageModal] = useState({ show: false, title: '', message: '' });
+
+  const {
+    searchTerm,
+    setSearchTerm,
+    sortField,
+    setSortField,
+    sortOrder,
+    setSortOrder,
+    applyFiltersAndSorting,
+  } = useRequestFilters('name', 'asc', ['name', 'email', 'role']);
+
 
   const closeMessageModal = () => {
     setMessageModal({ show: false, title: '', message: '' });
@@ -161,7 +172,32 @@ export default function UserManagementPage() {
 
         <section className="admin-section">
           <h3>👥 Approved Users ({approvedUsers.length})</h3>
-          {approvedUsers.length === 0 ? (
+          <div className="requests-controls">
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+            <select
+              value={`${sortField}-${sortOrder}`}
+              onChange={(e) => {
+                const [field, order] = e.target.value.split('-');
+                setSortField(field);
+                setSortOrder(order);
+              }}
+              className="sort-select"
+            >
+              <option value="name-asc">Name (A-Z)</option>
+              <option value="name-desc">Name (Z-A)</option>
+              <option value="email-asc">Email (A-Z)</option>
+              <option value="email-desc">Email (Z-A)</option>
+              <option value="role-asc">Role (A-Z)</option>
+              <option value="role-desc">Role (Z-A)</option>
+            </select>
+          </div>
+          {applyFiltersAndSorting(approvedUsers).length === 0 ? (
             <p>No approved users found.</p>
           ) : (
             <table className="admin-table">
@@ -174,7 +210,7 @@ export default function UserManagementPage() {
                 </tr>
               </thead>
               <tbody>
-                {approvedUsers.map(approvedUser => (
+                {applyFiltersAndSorting(approvedUsers).map(approvedUser => (
                   <tr key={approvedUser._id}>
                     <td>{approvedUser.name}</td>
                     <td>{approvedUser.email}</td>

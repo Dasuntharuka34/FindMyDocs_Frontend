@@ -4,7 +4,7 @@ module.exports = function(app) {
   app.use(
     '/api',
     createProxyMiddleware({
-      target: 'https://find-my-docs-backend.vercel.app',
+      target: process.env.REACT_APP_BACKEND_URL,
       changeOrigin: true,
       secure: true,
       onProxyReq: (proxyReq, req, res) => {

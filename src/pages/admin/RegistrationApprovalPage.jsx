@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
-
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../utils/api';
+import { useRequestFilters } from '../../hooks/useRequestFilters';
 
 const MessageModal = ({ show, title, message, onConfirm, onCancel }) => {
   if (!show) return null;
@@ -41,6 +41,21 @@ export default function RegistrationApprovalPage() {
   const [confirmAction, setConfirmAction] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [messageModal, setMessageModal] = useState({ show: false, title: '', message: '' });
+
+  const {
+    searchTerm,
+    setSearchTerm,
+    sortField,
+    setSortField,
+    sortOrder,
+    setSortOrder,
+    applyFiltersAndSorting,
+  } = useRequestFilters(
+    'submittedAt',
+    'desc',
+    ['name', 'email', 'role', 'nic', 'indexNumber', 'department']
+  );
+
 
   const closeMessageModal = () => {
     setMessageModal({ show: false, title: '', message: '' });
@@ -109,7 +124,32 @@ export default function RegistrationApprovalPage() {
 
         <section className="admin-section">
           <h3>📥 Pending Registrations ({pendingRegistrations.length})</h3>
-          {pendingRegistrations.length === 0 ? (
+          <div className="requests-controls">
+        <input
+          type="text"
+          placeholder="Search registrations..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="search-input"
+        />
+        <select
+          value={`${sortField}-${sortOrder}`}
+          onChange={(e) => {
+            const [field, order] = e.target.value.split('-');
+            setSortField(field);
+            setSortOrder(order);
+          }}
+          className="sort-select"
+        >
+          <option value="submittedAt-desc">Date (Newest First)</option>
+          <option value="submittedAt-asc">Date (Oldest First)</option>
+          <option value="name-asc">Name (A-Z)</option>
+          <option value="name-desc">Name (Z-A)</option>
+          <option value="email-asc">Email (A-Z)</option>
+          <option value="email-desc">Email (Z-A)</option>
+        </select>
+      </div>
+          {applyFiltersAndSorting(pendingRegistrations).length === 0 ? (
             <p>No new registration requests pending approval.</p>
           ) : (
             <table className="admin-table">
@@ -123,7 +163,7 @@ export default function RegistrationApprovalPage() {
                 </tr>
               </thead>
               <tbody>
-                {pendingRegistrations.map(reg => (
+                {applyFiltersAndSorting(pendingRegistrations).map(reg => (
                   <tr key={reg._id}>
                     <td>{reg.name}</td>
                     <td>{reg.email}</td>

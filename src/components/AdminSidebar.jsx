@@ -25,9 +25,12 @@ function AdminSidebar() {
         <li className={`admin-sidebar-item ${isActive('/admin/approved-requests') ? 'active' : ''}`}>
           <Link to="/admin/approved-requests" className="admin-sidebar-link">Approved Requests</Link>
         </li>
-        <li className={`admin-sidebar-item ${isActive('/admin/forms') ? 'active' : ''}`}>
-          <Link to="/admin/forms" className="admin-sidebar-link">Manage Forms</Link>
+        <li className={`admin-sidebar-item ${isActive('/admin/reports') ? 'active' : ''}`}>
+          <Link to="/admin/reports" className="admin-sidebar-link">Report Generation</Link>
         </li>
+        {/* <li className={`admin-sidebar-item ${isActive('/admin/forms') ? 'active' : ''}`}>
+          <Link to="/admin/forms" className="admin-sidebar-link">Manage Forms</Link>
+        </li> */}
         <li className={`admin-sidebar-item ${isActive('/profile') ? 'active' : ''}`}>
           <Link to="/profile" className="admin-sidebar-link">Profile</Link>
         </li>

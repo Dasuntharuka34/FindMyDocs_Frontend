@@ -287,14 +287,7 @@ const ProfilePage = ({ isAdmin = false }) => {
           </div>
           <div className="form-group">
             <label htmlFor="department">Department:</label>
-            <select id="department" name="department" value={editFormData.department} onChange={handleEditFormChange} required>
-              <option value="">-- Select Department --</option>
-              {departments.map((dept) => (
-                <option key={dept} value={dept}>
-                  {dept}
-                </option>
-              ))}
-            </select>
+            <input type="text" id="department" name="department" value={editFormData.department} onChange={handleEditFormChange} required disabled />
 
           </div>
           {editFormData.role === 'Student' && (

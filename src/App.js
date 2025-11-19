@@ -29,6 +29,7 @@ import EditFormPage from './pages/admin/EditFormPage';
 import AvailableFormsPage from './pages/AvailableFormsPage';
 import RenderFormPage from './pages/RenderFormPage';
 import MySubmissionsPage from './pages/MySubmissionsPage';
+import ReportGenerationPage from './pages/admin/ReportGenerationPage';
 import ContactSupportPage from './pages/ContactSupportPage';
 import { ThemeProvider } from './context/ThemeContext';
 import AutoLogout from './components/AutoLogout';
@@ -140,6 +141,14 @@ function App() {
           <PrivateRoute allowedRoles={['Admin']}>
             <AdminLayout>
               <EditFormPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/reports" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <ReportGenerationPage />
             </AdminLayout>
           </PrivateRoute>
         } />

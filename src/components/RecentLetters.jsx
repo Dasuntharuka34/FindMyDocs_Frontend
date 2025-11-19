@@ -37,7 +37,7 @@ function RecentLetters({ letters }) {
         <table>
           <thead>
             <tr>
-              <td>ID</td>
+              {/* <td>ID</td> */}
               <td>Type</td>
               <td>Status</td>
               <td>Last Updated</td>
@@ -47,7 +47,7 @@ function RecentLetters({ letters }) {
           <tbody>
             {letters.map(({ _id, type, status, lastUpdated }) => (
               <tr key={_id}>
-                <td data-label="ID">{_id}</td>
+                {/* <td data-label="ID">{_id}</td> */}
                 <td data-label="Type">{type}</td>
                 <td data-label="Status">
                   <span

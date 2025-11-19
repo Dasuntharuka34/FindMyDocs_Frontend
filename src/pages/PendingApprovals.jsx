@@ -249,6 +249,7 @@ function PendingApprovals() {
     <div className="pending-approvals-container">
       <div className="approvals-layout">
         <div className="approvals-content">
+          <section>
           <h2>Pending Approvals</h2>
 
           {/* --- Excuse Requests Table --- */}
@@ -296,9 +297,10 @@ function PendingApprovals() {
               </table>
             )}
           </div>
+        </section>
 
           <br />
-
+            <section>
           {/* --- Leave Requests Table --- */}
           <div className="approvals-section">
             <h3>Leave Requests</h3>
@@ -344,6 +346,7 @@ function PendingApprovals() {
               </table>
             )}
           </div>
+          </section>
         </div>
       </div>
 

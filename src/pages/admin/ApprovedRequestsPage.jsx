@@ -6,6 +6,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import MessageModal from '../../components/MessageModal'; // Assuming a shared MessageModal component
 import '../../styles/pages/ApprovedRequestsPage.css'; // New CSS file
+import { useRequestFilters } from '../../hooks/useRequestFilters';
 
 // --- APPROVAL STAGE DEFINITIONS (Copied from PendingApprovals.jsx for consistency) ---
 const approvalStages = [
@@ -32,6 +33,17 @@ const ApprovedRequestsPage = () => {
   const [approvedExcuseRequests, setApprovedExcuseRequests] = useState([]);
   const [approvedLeaveRequests, setApprovedLeaveRequests] = useState([]);
   const [messageModal, setMessageModal] = useState({ show: false, title: '', message: '' });
+
+  const {
+    searchTerm,
+    setSearchTerm,
+    sortField,
+    setSortField,
+    sortOrder,
+    setSortOrder,
+    applyFiltersAndSorting,
+  } = useRequestFilters('approvedDate', 'desc');
+
 
   const closeMessageModal = () => {
     setMessageModal({ show: false, title: '', message: '' });
@@ -110,12 +122,39 @@ const ApprovedRequestsPage = () => {
     <div className="approved-requests-container">
       <div className="approved-requests-layout">
         <div className="approved-requests-content">
+          <section>
           <h2>Approved Requests</h2>
+
+          <div className="requests-controls">
+            <input
+              type="text"
+              placeholder="Search approved requests..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+            <select
+              value={`${sortField}-${sortOrder}`}
+              onChange={(e) => {
+                const [field, order] = e.target.value.split('-');
+                setSortField(field);
+                setSortOrder(order);
+              }}
+              className="sort-select"
+            >
+              <option value="approvedDate-desc">Approved Date (Newest First)</option>
+              <option value="approvedDate-asc">Approved Date (Oldest First)</option>
+              <option value="submittedDate-desc">Submitted Date (Newest First)</option>
+              <option value="submittedDate-asc">Submitted Date (Oldest First)</option>
+              <option value="studentName-asc">Requester (A-Z)</option>
+              <option value="studentName-desc">Requester (Z-A)</option>
+            </select>
+          </div>
 
           {/* --- Approved Excuse Requests Table --- */}
           <div className="requests-section">
             <h3>Approved Excuse Requests</h3>
-            {approvedExcuseRequests.length === 0 ? (
+            {applyFiltersAndSorting(approvedExcuseRequests).length === 0 ? (
               <p>No approved excuse requests.</p>
             ) : (
               <table className="requests-table">
@@ -129,7 +168,7 @@ const ApprovedRequestsPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {approvedExcuseRequests.map(request => (
+                  {applyFiltersAndSorting(approvedExcuseRequests).map(request => (
                     <tr key={request._id}>
                       <td>{request.studentName}</td>
                       <td>{request.submittedDate ? new Date(request.submittedDate).toLocaleDateString() : 'N/A'}</td>
@@ -150,13 +189,14 @@ const ApprovedRequestsPage = () => {
             </table>
           )}
         </div>
+        </section>
 
         <br />
-
+        <section>
         {/* --- Approved Leave Requests Table --- */}
         <div className="requests-section">
           <h3>Approved Leave Requests</h3>
-          {approvedLeaveRequests.length === 0 ? (
+          {applyFiltersAndSorting(approvedLeaveRequests).length === 0 ? (
             <p>No approved leave requests.</p>
             ) : (
               <table className="requests-table">
@@ -170,7 +210,7 @@ const ApprovedRequestsPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {approvedLeaveRequests.map(request => (
+                  {applyFiltersAndSorting(approvedLeaveRequests).map(request => (
                     <tr key={request._id}>
                       <td>{request.studentName}</td>
                       <td>{request.submittedDate ? new Date(request.submittedDate).toLocaleDateString() : 'N/A'}</td>
@@ -191,7 +231,9 @@ const ApprovedRequestsPage = () => {
             </table>
           )}
         </div>
+        </section>
       </div>
+      
       </div>
 
       <Footer />

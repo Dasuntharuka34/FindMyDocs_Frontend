@@ -20,6 +20,10 @@
   box-sizing: border-box;
 }
 
+option {
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+}
 /* Form titles and subtitles */
 .form-title {
   text-align: center;

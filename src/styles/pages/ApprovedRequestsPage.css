@@ -14,6 +14,13 @@
   padding: 20px;
 }
 
+.approved-requests-content section {
+  background-color: var(--bg-secondary);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 6px rgb(0 0 0 / 0.1);
+  margin-bottom: 30px;
+}
 /* Style for each request section (Excuse and Leave) */
 .requests-section {
   margin-bottom: 30px; /* Provides space between the two tables */

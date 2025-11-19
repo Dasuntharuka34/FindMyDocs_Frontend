@@ -9,7 +9,7 @@ body, html, #root {
 
 .registration-page {
   height: 100;
-  background: url('../../assets/UOJ_login.jpg') no-repeat center center;
+  background: url('../../assets/bg-01.jpg') no-repeat center center;
   background-size: cover;
   display: flex;
   justify-content: center;
@@ -61,6 +61,10 @@ body, html, #root {
   max-width: 500px;
   border: 1px solid #ccc;
 
+}
+option {
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
 }
 
 .registration-input::placeholder {
