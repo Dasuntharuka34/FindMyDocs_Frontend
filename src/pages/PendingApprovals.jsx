@@ -70,6 +70,7 @@ function PendingApprovals() {
 
   const [excuseRequests, setExcuseRequests] = useState([]);
   const [leaveRequests, setLeaveRequests] = useState([]);
+  const [otherLetterRequests, setOtherLetterRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
@@ -129,10 +130,37 @@ function PendingApprovals() {
     }
   };
 
+  const fetchPendingOtherLetterRequests = async () => {
+    if (!user || !user.role) return;
+    const targetStageIndex = approverRoleToStageIndex[user.role];
+    if (targetStageIndex === undefined) {
+      setOtherLetterRequests([]);
+      return;
+    }
+    // Assuming 'Letter' requests follow the same approval stages as 'LeaveRequest'
+    const targetStatusName = approvalStages.LeaveRequest[targetStageIndex].name; 
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/letters/pendingApprovals/${targetStatusName}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setOtherLetterRequests(data);
+    } catch (error) {
+      console.error("Error fetching pending other letter requests:", error);
+      setMessageModal({ show: true, title: 'Error', message: `Failed to load other letter requests: ${error.message}`, onConfirm: closeMessageModal });
+    }
+  };
+
   useEffect(() => {
     if (user && user.role) {
       fetchPendingExcuseRequests();
       fetchPendingLeaveRequests();
+      fetchPendingOtherLetterRequests();
     }
   }, [user]);
 
@@ -143,7 +171,8 @@ function PendingApprovals() {
     }
 
     try {
-      const isLeaveRequest = request.type !== undefined;
+      const isLeaveRequest = request.type === "LeaveRequest";
+      const isOtherLetterRequest = request.type === "Letter";
       
       // --- FIX START: Include approverId in request body ---
       let apiEndpoint;
@@ -168,7 +197,29 @@ function PendingApprovals() {
             rejectionReason: reason 
           };
         }
-      } else { 
+      } else if (isOtherLetterRequest) { // Handle other letter requests
+        if (action === 'approve') {
+          apiEndpoint = `${process.env.REACT_APP_BACKEND_URL}/api/letters/${request._id}/status`;
+          requestBody = { 
+            status: 'approved',
+            approverRole: user.role,
+            approverId: user._id 
+          };
+        } else if (action === 'reject') {
+          if (reason.trim() === '') {
+            setMessageModal({ show: true, title: 'Input Required', message: 'Please provide a reason for rejection.', onConfirm: closeMessageModal });
+            return;
+          }
+          apiEndpoint = `${process.env.REACT_APP_BACKEND_URL}/api/letters/${request._id}/status`;
+          requestBody = { 
+            status: 'rejected',
+            approverRole: user.role,
+            approverId: user._id, 
+            comment: reason 
+          };
+        }
+      }
+      else { 
         // For excuse requests
         if (action === 'approve') {
           apiEndpoint = `${process.env.REACT_APP_BACKEND_URL}/api/excuserequests/${request._id}/approve`;
@@ -207,7 +258,10 @@ function PendingApprovals() {
 
       if (isLeaveRequest) {
         fetchPendingLeaveRequests();
-      } else {
+      } else if (isOtherLetterRequest) {
+        fetchPendingOtherLetterRequests();
+      }
+      else {
         fetchPendingExcuseRequests();
       }
 
@@ -337,6 +391,55 @@ function PendingApprovals() {
                             <>
                               <button onClick={() => confirmAndHandle({ ...request, type: "LeaveRequest" }, 'approve')} className="approve-btn">Approve</button>
                               <button onClick={() => confirmAndHandle({ ...request, type: "LeaveRequest" }, 'reject')} className="reject-btn">Reject</button>
+                            </>
+                          )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+          </section>
+
+          <br />
+            <section>
+          {/* --- Other Letters Table --- */}
+          <div className="approvals-section">
+            <h3>Other Letters</h3>
+            {otherLetterRequests.length === 0 ? (
+              <p>No pending other letter requests.</p>
+            ) : (
+              <table className="approvals-table">
+                <thead>
+                  <tr>
+                    <th>Requester</th>
+                    <th>Submitted On</th>
+                    <th>Status</th>
+                    <th>View Details</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {otherLetterRequests.map(request => (
+                    <tr key={request._id}>
+                      <td>{request.student}</td>
+                      <td>{request.submittedDate ? new Date(request.submittedDate).toLocaleDateString() : 'N/A'}</td>
+                      <td>
+                        <span className={`status-badge ${request.status ? request.status.toLowerCase().replace(/\s/g, '-') : ''}`}>
+                          {request.status}
+                        </span>
+                      </td>
+                      <td>
+                        <Link to={`/documents/${request._id}`} className="view-details-btn">
+                          View Details
+                        </Link>
+                      </td>
+                      <td>
+                        {request.status === approvalStages.LeaveRequest[approverRoleToStageIndex[user.role]]?.name && (
+                            <>
+                              <button onClick={() => confirmAndHandle({ ...request, type: "Letter" }, 'approve')} className="approve-btn">Approve</button>
+                              <button onClick={() => confirmAndHandle({ ...request, type: "Letter" }, 'reject')} className="reject-btn">Reject</button>
                             </>
                           )}
                       </td>

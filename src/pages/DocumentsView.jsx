@@ -204,7 +204,7 @@ const DocumentsView = () => {
             {document.attachments && (
                 <p>
                   <strong>Attachments:</strong> {' '}
-                  <a href={`${process.env.REACT_APP_BACKEND_URL}/${document.attachments}`} target="_blank" rel="noopener noreferrer">
+                  <a href={`${document.attachments}`} target="_blank" rel="noopener noreferrer">
                     View Attachment
                   </a>
                 </p>
