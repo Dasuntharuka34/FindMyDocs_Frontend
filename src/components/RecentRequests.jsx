@@ -44,7 +44,7 @@ function RecentRequests({ requests }) {
                     </thead>
                     <tbody>
                         {requests.map((request) => {
-                            const { _id, requestType, type, reason, purpose, submittedDate, status } = request;
+                            const { _id, requestType, reason, purpose, submittedDate, status } = request;
 
                             // Determine the display values based on request type
                             const displayReason = reason || purpose || 'N/A';
