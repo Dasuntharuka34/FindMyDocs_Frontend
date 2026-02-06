@@ -18,13 +18,7 @@ const approvalStages = [
   { name: "Approved", approverRole: null }
 ];
 
-// Maps student role to initial stage index
-const submitterRoleToInitialStageIndex = {
-  "Student": 1,
-  "Lecturer": 2,   // Lecturer submits, skips Staff, starts at "Pending Lecturer Approval"
-  "HOD": 3,        // HOD submits, skips Staff, Lecturer, starts at "Pending HOD Approval"
-  "Dean": 4,
-};
+
 // --- END APPROVAL STAGE DEFINITIONS ---
 
 const ApprovedRequestsPage = () => {
@@ -49,7 +43,7 @@ const ApprovedRequestsPage = () => {
     setMessageModal({ show: false, title: '', message: '' });
   };
 
-  const fetchApprovedExcuseRequests = async () => {
+  const fetchApprovedExcuseRequests = React.useCallback(async () => {
     if (!user || !token) return;
     try {
       // Assuming 'Approved' is the final status name for approved requests
@@ -68,9 +62,9 @@ const ApprovedRequestsPage = () => {
       console.error("Error fetching approved excuse requests:", error);
       setMessageModal({ show: true, title: 'Error', message: `Failed to load approved excuse requests: ${error.message}` });
     }
-  };
+  }, [user, token]);
 
-  const fetchApprovedLeaveRequests = async () => {
+  const fetchApprovedLeaveRequests = React.useCallback(async () => {
     if (!user || !token) return;
     try {
       // Assuming 'Approved' is the final status name for approved requests
@@ -89,14 +83,14 @@ const ApprovedRequestsPage = () => {
       console.error("Error fetching approved leave requests:", error);
       setMessageModal({ show: true, title: 'Error', message: `Failed to load approved leave requests: ${error.message}` });
     }
-  };
+  }, [user, token]);
 
   useEffect(() => {
     if (user && token) {
       fetchApprovedExcuseRequests();
       fetchApprovedLeaveRequests();
     }
-  }, [user, token]);
+  }, [user, token, fetchApprovedExcuseRequests, fetchApprovedLeaveRequests]);
 
   if (!user) {
     return <p>Loading user data...</p>;
@@ -123,117 +117,117 @@ const ApprovedRequestsPage = () => {
       <div className="approved-requests-layout">
         <div className="approved-requests-content">
           <section>
-          <h2>Approved Requests</h2>
+            <h2>Approved Requests</h2>
 
-          <div className="requests-controls">
-            <input
-              type="text"
-              placeholder="Search approved requests..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-            <select
-              value={`${sortField}-${sortOrder}`}
-              onChange={(e) => {
-                const [field, order] = e.target.value.split('-');
-                setSortField(field);
-                setSortOrder(order);
-              }}
-              className="sort-select"
-            >
-              <option value="approvedDate-desc">Approved Date (Newest First)</option>
-              <option value="approvedDate-asc">Approved Date (Oldest First)</option>
-              <option value="submittedDate-desc">Submitted Date (Newest First)</option>
-              <option value="submittedDate-asc">Submitted Date (Oldest First)</option>
-              <option value="studentName-asc">Requester (A-Z)</option>
-              <option value="studentName-desc">Requester (Z-A)</option>
-            </select>
-          </div>
+            <div className="requests-controls">
+              <input
+                type="text"
+                placeholder="Search approved requests..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+              <select
+                value={`${sortField}-${sortOrder}`}
+                onChange={(e) => {
+                  const [field, order] = e.target.value.split('-');
+                  setSortField(field);
+                  setSortOrder(order);
+                }}
+                className="sort-select"
+              >
+                <option value="approvedDate-desc">Approved Date (Newest First)</option>
+                <option value="approvedDate-asc">Approved Date (Oldest First)</option>
+                <option value="submittedDate-desc">Submitted Date (Newest First)</option>
+                <option value="submittedDate-asc">Submitted Date (Oldest First)</option>
+                <option value="studentName-asc">Requester (A-Z)</option>
+                <option value="studentName-desc">Requester (Z-A)</option>
+              </select>
+            </div>
 
-          {/* --- Approved Excuse Requests Table --- */}
-          <div className="requests-section">
-            <h3>Approved Excuse Requests</h3>
-            {applyFiltersAndSorting(approvedExcuseRequests).length === 0 ? (
-              <p>No approved excuse requests.</p>
-            ) : (
-              <table className="requests-table">
-                <thead>
-                  <tr>
-                    <th>Requester</th>
-                    <th>Submitted On</th>
-                    <th>Approved On</th>
-                    <th>Status</th>
-                    <th>View Details</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {applyFiltersAndSorting(approvedExcuseRequests).map(request => (
-                    <tr key={request._id}>
-                      <td>{request.studentName}</td>
-                      <td>{request.submittedDate ? new Date(request.submittedDate).toLocaleDateString() : 'N/A'}</td>
-                      <td>{request.approvedDate ? new Date(request.approvedDate).toLocaleDateString() : 'N/A'}</td>
-                    <td>
-                      <span className={`status-badge ${request.status ? request.status.toLowerCase().replace(/\s/g, '-') : ''}`}>
-                        {request.status}
-                      </span>
-                    </td>
-                    <td>
-                      <Link to={`/excuse-request/${request._id}`} className="view-details-btn">
-                        View Details
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+            {/* --- Approved Excuse Requests Table --- */}
+            <div className="requests-section">
+              <h3>Approved Excuse Requests</h3>
+              {applyFiltersAndSorting(approvedExcuseRequests).length === 0 ? (
+                <p>No approved excuse requests.</p>
+              ) : (
+                <table className="requests-table">
+                  <thead>
+                    <tr>
+                      <th>Requester</th>
+                      <th>Submitted On</th>
+                      <th>Approved On</th>
+                      <th>Status</th>
+                      <th>View Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {applyFiltersAndSorting(approvedExcuseRequests).map(request => (
+                      <tr key={request._id}>
+                        <td>{request.studentName}</td>
+                        <td>{request.submittedDate ? new Date(request.submittedDate).toLocaleDateString() : 'N/A'}</td>
+                        <td>{request.approvedDate ? new Date(request.approvedDate).toLocaleDateString() : 'N/A'}</td>
+                        <td>
+                          <span className={`status-badge ${request.status ? request.status.toLowerCase().replace(/\s/g, '-') : ''}`}>
+                            {request.status}
+                          </span>
+                        </td>
+                        <td>
+                          <Link to={`/excuse-request/${request._id}`} className="view-details-btn">
+                            View Details
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </section>
+
+          <br />
+          <section>
+            {/* --- Approved Leave Requests Table --- */}
+            <div className="requests-section">
+              <h3>Approved Leave Requests</h3>
+              {applyFiltersAndSorting(approvedLeaveRequests).length === 0 ? (
+                <p>No approved leave requests.</p>
+              ) : (
+                <table className="requests-table">
+                  <thead>
+                    <tr>
+                      <th>Requester</th>
+                      <th>Submitted On</th>
+                      <th>Approved On</th>
+                      <th>Status</th>
+                      <th>View Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {applyFiltersAndSorting(approvedLeaveRequests).map(request => (
+                      <tr key={request._id}>
+                        <td>{request.studentName}</td>
+                        <td>{request.submittedDate ? new Date(request.submittedDate).toLocaleDateString() : 'N/A'}</td>
+                        <td>{request.approvedDate ? new Date(request.approvedDate).toLocaleDateString() : 'N/A'}</td>
+                        <td>
+                          <span className={`status-badge ${request.status ? request.status.toLowerCase().replace(/\s/g, '-') : ''}`}>
+                            {request.status}
+                          </span>
+                        </td>
+                        <td>
+                          <Link to={`/leave-request/${request._id}`} className="view-details-btn">
+                            View Details
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </section>
         </div>
-        </section>
 
-        <br />
-        <section>
-        {/* --- Approved Leave Requests Table --- */}
-        <div className="requests-section">
-          <h3>Approved Leave Requests</h3>
-          {applyFiltersAndSorting(approvedLeaveRequests).length === 0 ? (
-            <p>No approved leave requests.</p>
-            ) : (
-              <table className="requests-table">
-                <thead>
-                  <tr>
-                    <th>Requester</th>
-                    <th>Submitted On</th>
-                    <th>Approved On</th>
-                    <th>Status</th>
-                    <th>View Details</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {applyFiltersAndSorting(approvedLeaveRequests).map(request => (
-                    <tr key={request._id}>
-                      <td>{request.studentName}</td>
-                      <td>{request.submittedDate ? new Date(request.submittedDate).toLocaleDateString() : 'N/A'}</td>
-                      <td>{request.approvedDate ? new Date(request.approvedDate).toLocaleDateString() : 'N/A'}</td>
-                    <td>
-                      <span className={`status-badge ${request.status ? request.status.toLowerCase().replace(/\s/g, '-') : ''}`}>
-                        {request.status}
-                      </span>
-                    </td>
-                    <td>
-                      <Link to={`/leave-request/${request._id}`} className="view-details-btn">
-                        View Details
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-        </section>
-      </div>
-      
       </div>
 
       <Footer />

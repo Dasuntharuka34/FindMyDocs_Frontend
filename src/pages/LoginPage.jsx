@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom";
 import universityLogo from '../assets/uoj.png'; // Make sure this path is correct
 import Footer from "../components/Footer"; // Make sure this path is correct
 import '../styles/pages/LoginPage.css'; // You'll need to create or update this CSS file
@@ -14,14 +14,14 @@ export default function LoginPage() {
   });
 
   const [error, setError] = useState("");
-   const [showPassword, setShowPassword] = useState(false); // New state for password visibility
+  const [showPassword, setShowPassword] = useState(false); // New state for password visibility
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const [messageModal, setMessageModal] = useState({ show: false, title: '', message: '' });
 
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
-  const handleChange = (e) => { 
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError(""); // Clear error on input change
   };
@@ -32,11 +32,11 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.nic.trim() === "") { 
+    if (formData.nic.trim() === "") {
       setError("NIC cannot be empty");
       return;
     }
-    if (formData.password.trim() === "") { 
+    if (formData.password.trim() === "") {
       setError("Password cannot be empty");
       return;
     }
@@ -47,7 +47,7 @@ export default function LoginPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData), 
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
@@ -58,18 +58,18 @@ export default function LoginPage() {
       // --- END DEBUGGING LOGS ---
 
       if (response.ok) {
-        login(data.token, data.user); 
+        login(data.token, data.user);
         setMessageModal({ show: true, title: 'Success', message: 'Login successful!' });
-        
+
         if (typeof data.user === 'object' && data.user !== null && data.user.role) {
-            if (data.user.role === 'Admin') {
-                navigate('/admin-dashboard');
-            } else {
-                navigate('/dashboard');
-            }
+          if (data.user.role === 'Admin') {
+            navigate('/admin-dashboard');
+          } else {
+            navigate('/dashboard');
+          }
         } else {
-            console.error("Login successful, but received invalid user object for navigation:", data.user);
-            setMessageModal({ show: true, title: 'Error', message: 'Login successful, but user data invalid for navigation. Please contact support.', onConfirm: closeMessageModal });
+          console.error("Login successful, but received invalid user object for navigation:", data.user);
+          setMessageModal({ show: true, title: 'Error', message: 'Login successful, but user data invalid for navigation. Please contact support.', onConfirm: closeMessageModal });
         }
       } else {
         setMessageModal({ show: true, title: 'Login Failed', message: data.message || 'Invalid NIC or password.' });
@@ -90,7 +90,7 @@ export default function LoginPage() {
   const closeForgotPasswordModal = () => {
     setShowForgotPasswordModal(false);
   };
-   // Function to toggle password visibility
+  // Function to toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -99,64 +99,64 @@ export default function LoginPage() {
     <div className="login-page">
       <div className="login-container">
         <div className="login-box">
-        <h2>School of Alchemist</h2>
-        <div className="flex justify-center mb-6">
-          <img
-            src={universityLogo}
-            alt="School of Alchemist Logo"
-            className="login-logo"
-          />
-        </div>
-        <h2>Login</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-          <input
-            className="login-input"
-            type="text"
-            name="nic"
-            placeholder="NIC Number"
-            value={formData.nic} 
-            onChange={handleChange}
-            required
-          />
+          <h2>School of Alchemist</h2>
+          <div className="flex justify-center mb-6">
+            <img
+              src={universityLogo}
+              alt="School of Alchemist Logo"
+              className="login-logo"
+            />
           </div>
-          <div className="form-group">
-          <div className="password-input-container"> {/* Container for password input and toggle */}
+          <h2>Login</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <input
+                className="login-input"
+                type="text"
+                name="nic"
+                placeholder="NIC Number"
+                value={formData.nic}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <div className="password-input-container"> {/* Container for password input and toggle */}
 
-          <input
-            className="login-input"
-            type={showPassword ? 'text' : 'password'}
-            name="password" 
-            placeholder="Password"
-            value={formData.password} 
-            onChange={handleChange}
-            required
-          />
-          <button
-              type="button"
-              onClick={togglePasswordVisibility}
-              className="password-toggle-btn"
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-            >
-              {showPassword ? '🔓' : '🔒'} {/* icon for show/hide */}
+                <input
+                  className="login-input"
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="password-toggle-btn"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? '🔓' : '🔒'} {/* icon for show/hide */}
+                </button>
+              </div>
+            </div>
+            {error && <p className="text-red-600 font-medium">{error}</p>}
+            <button type="submit" className="login-btn">
+              Login
             </button>
+          </form>
+          <div className="login-links">
+            <p>
+              Forgot <button className="link-button" onClick={openForgotPasswordModal}>Password?</button>
+            </p>
+            <p>
+              Don't have an account? <Link to="/register">Sign up</Link>
+            </p>
           </div>
-          </div>
-          {error && <p className="text-red-600 font-medium">{error}</p>}
-          <button type="submit" className="login-btn">
-            Login
-          </button>
-        </form>
-        <div className="login-links">
-          <p>
-            Forgot <a href="#" onClick={openForgotPasswordModal}>Password?</a>
-          </p>
-          <p>
-            Don't have an account? <Link to="/register">Sign up</Link>
-          </p>
-        </div>
-        <div className="footer-wrapper">
-          <Footer />
+          <div className="footer-wrapper">
+            <Footer />
           </div>
         </div>
       </div>
@@ -173,7 +173,7 @@ export default function LoginPage() {
         show={messageModal.show}
         title={messageModal.title}
         message={messageModal.message}
-        onConfirm={closeMessageModal} 
+        onConfirm={closeMessageModal}
       />
     </div>
   );

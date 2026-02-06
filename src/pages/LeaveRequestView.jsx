@@ -45,14 +45,14 @@ const LeaveRequestView = () => {
             'Authorization': `Bearer ${token}`
           }
         });
-        
+
         if (!response.ok) {
           if (response.status === 404) {
             throw new Error("Leave request not found with this ID.");
           }
           throw new Error(`Failed to fetch leave request: HTTP status ${response.status}`);
         }
-        
+
         const fetchedRequest = await response.json();
 
         // Authorization check
@@ -77,23 +77,23 @@ const LeaveRequestView = () => {
     };
 
     fetchLeaveRequestDetails();
-  }, [id, user]);
+  }, [id, user, token]);
 
   if (loading) {
     return (
-      <p style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem'}}>Loading leave request details...</p>
+      <p style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem' }}>Loading leave request details...</p>
     );
   }
 
   if (error) {
     return (
-      <div className="error-message" style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>{error}</div>
+      <div className="error-message" style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red' }}>{error}</div>
     );
   }
 
   if (!leaveRequest) {
     return (
-      <div className="error-message" style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>Leave request not found.</div>
+      <div className="error-message" style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red' }}>Leave request not found.</div>
     );
   }
 
@@ -123,23 +123,23 @@ const LeaveRequestView = () => {
       };
     }) || [];
 
-    // Add initial submission to history
-    if (leaveRequest) {
-        history.unshift({
-            stage: 0,
-            status: 'Submitted',
-            timestamp: leaveRequest.submittedDate,
-            updatedBy: leaveRequest.studentName,
-            comments: 'Initial submission'
-        });
-    }
-  
+  // Add initial submission to history
+  if (leaveRequest) {
+    history.unshift({
+      stage: 0,
+      status: 'Submitted',
+      timestamp: leaveRequest.submittedDate,
+      updatedBy: leaveRequest.studentName,
+      comments: 'Initial submission'
+    });
+  }
+
   return (
     <div className="document-container">
       <div className="document-header-row">
         <h1>Leave Request Details</h1>
       </div>
-      
+
       <div className="document-info">
         <p><strong>Request ID:</strong> {leaveRequest._id}</p>
         <p><strong>Current Status:</strong> {leaveRequest.status}</p>
@@ -150,7 +150,7 @@ const LeaveRequestView = () => {
         <p><strong>Leave Period:</strong> {new Date(leaveRequest.startDate).toLocaleDateString()} to {new Date(leaveRequest.endDate).toLocaleDateString()}</p>
         <p><strong>Contact during Leave:</strong> {leaveRequest.contactDuringLeave}</p>
         <p><strong>Remarks:</strong> {leaveRequest.remarks || 'N/A'}</p>
-        
+
         {leaveRequest.attachments && (
           <p>
             <strong>Attachments:</strong> {' '}
@@ -163,7 +163,7 @@ const LeaveRequestView = () => {
 
       <div className="progress-section">
         <h3>Approval Progress</h3>
-        <ProgressTracker 
+        <ProgressTracker
           stages={approvalStages.map(s => s.name)}
           currentStage={leaveRequest.currentStageIndex}
         />

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import api from '../../utils/api';
 import { AuthContext } from '../../context/AuthContext';
 import '../../styles/pages/AllRequestsPage.css'; // Assuming you'll create this CSS file
@@ -13,7 +13,7 @@ const AllRequestsPage = () => {
   const [letters, setLetters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
+
 
   const {
     searchTerm,
@@ -24,23 +24,6 @@ const AllRequestsPage = () => {
     setSortOrder,
     applyFiltersAndSorting,
   } = useRequestFilters('submittedDate', 'desc');
-
-  const handleView = (type, id) => {
-    switch (type) {
-      case 'excuse':
-        navigate(`/admin/excuse-requests/${id}`);
-        break;
-      case 'leave':
-        navigate(`/admin/leave-requests/${id}`);
-        break;
-      case 'letter':
-        navigate(`/admin/letters/${id}`); // Assuming a route for letters
-        break;
-      default:
-        break;
-    }
-  };
-
 
 
   useEffect(() => {
@@ -53,10 +36,10 @@ const AllRequestsPage = () => {
 
       try {
         const [excuseRes, leaveRes, letterRes] = await Promise.all([
-                api.get(`/excuserequests`),
-                api.get(`/leaverequests`),
-                api.get(`/letters`),
-              ]);
+          api.get(`/excuserequests`),
+          api.get(`/leaverequests`),
+          api.get(`/letters`),
+        ]);
         setExcuseRequests(excuseRes.data);
         setLeaveRequests(leaveRes.data);
         setLetters(letterRes.data);
@@ -135,8 +118,8 @@ const AllRequestsPage = () => {
                     <td>{request.email}</td>
                     <td>{request.reason}</td>
                     <td><span className={`status-badge ${request.status ? request.status.toLowerCase().replace(/\s/g, '-') : ''}`}>
-                        {request.status}
-                      </span></td>
+                      {request.status}
+                    </span></td>
 
                     <td>{new Date(request.submittedDate).toLocaleDateString()}</td>
                     <td><Link to={`/excuse-request/${request._id}`} className="view-details-btn">View Details</Link></td>
@@ -174,8 +157,8 @@ const AllRequestsPage = () => {
                     {/* <td>{request.nicNumber}</td> */}
                     <td>{request.reason}</td>
                     <td><span className={`status-badge ${request.status ? request.status.toLowerCase().replace(/\s/g, '-') : ''}`}>
-                        {request.status}
-                      </span></td>
+                      {request.status}
+                    </span></td>
                     <td>{new Date(request.submittedDate).toLocaleDateString()}</td>
                     <td><Link to={`/leave-request/${request._id}`} className="view-details-btn">View Details</Link></td>
                   </tr>
@@ -212,14 +195,14 @@ const AllRequestsPage = () => {
                     {/* <td>{letter.nicNumber}</td> */}
                     <td>{letter.type}</td>
                     <td><span className={`status-badge ${letter.status ? letter.status.toLowerCase().replace(/\s/g, '-') : ''}`}>
-                        {letter.status}
-                      </span></td>
+                      {letter.status}
+                    </span></td>
                     <td>{new Date(letter.submittedDate).toLocaleDateString()}</td>
                     <td>
                       <Link to={`/documents/${letter._id}`} className="view-details-btn">
                         View Details
-                      </Link>                    
-                      </td>
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>

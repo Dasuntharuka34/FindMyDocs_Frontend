@@ -138,6 +138,22 @@
   text-decoration: underline;
 }
 
+/* Link button style */
+.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #1a3e72; /* Match register link color */
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
+.link-button:hover {
+  text-decoration: none;
+}
+
 /* Modal styles - should be consistent with common-dashboard/NewLetterModal.css */
 /* These are just copied for completeness if NewLetterModal.css isn't automatically applied */
 .modal-overlay {

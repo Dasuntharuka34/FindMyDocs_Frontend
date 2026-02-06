@@ -1,13 +1,18 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState, useContext, useEffect, useRef, useCallback } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Sidebar from '../components/Sidebar';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/pages/ProfilePage.css';
 import MessageModal from '../components/MessageModal';
-import { validateEmail, validateNic, validateMobile } from '../utils/validation';
-import { departments } from '../config/departments';
+import { validateMobile } from '../utils/validation';
 
+const defaultProfilePic = 'https://placehold.co/100x100/aabbcc/ffffff?text=User';
+
+const getFullImageUrl = (relativePath) => {
+  if (!relativePath) return defaultProfilePic;
+  return `${relativePath}?t=${new Date().getTime()}`;
+};
 
 // ----------------- ProfilePage Main Component -----------------
 
@@ -37,17 +42,10 @@ const ProfilePage = ({ isAdmin = false }) => {
   const [profilePicturePreview, setProfilePicturePreview] = useState(null);
   const fileInputRef = useRef(null);
 
-  const [messageModal, setMessageModal] = useState({ show: false, title: '', message: '', onConfirm: () => {} });
+  const [messageModal, setMessageModal] = useState({ show: false, title: '', message: '', onConfirm: () => { } });
   const [error, setError] = useState('');
 
-  const defaultProfilePic = 'https://placehold.co/100x100/aabbcc/ffffff?text=User';
-
-  const getFullImageUrl = (relativePath) => {
-    if (!relativePath) return defaultProfilePic;
-    return `${relativePath}?t=${new Date().getTime()}`;
-  };
-
-  const resetFormState = () => {
+  const resetFormState = useCallback(() => {
     if (user) {
       setEditFormData({
         name: user.name || '',
@@ -60,15 +58,15 @@ const ProfilePage = ({ isAdmin = false }) => {
       });
       setProfilePicturePreview(getFullImageUrl(user.profilePicture));
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     resetFormState();
-  }, [user]);
+  }, [user, resetFormState]);
 
 
   const closeMessageModal = () => {
-    setMessageModal({ show: false, title: '', message: '', onConfirm: () => {} });
+    setMessageModal({ show: false, title: '', message: '', onConfirm: () => { } });
     setError('');
   };
 
@@ -335,7 +333,7 @@ const ProfilePage = ({ isAdmin = false }) => {
 
   if (!user) {
     if (isAdmin) {
-      return <p style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem'}}>Loading user profile...</p>;
+      return <p style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem' }}>Loading user profile...</p>;
     } else {
       return (
         <div className="profile-container">
@@ -343,7 +341,7 @@ const ProfilePage = ({ isAdmin = false }) => {
           <div className="profile-layout">
             <Sidebar />
             <main className="profile-content">
-              <p style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem'}}>Loading user profile...</p>
+              <p style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem' }}>Loading user profile...</p>
             </main>
           </div>
           <Footer />

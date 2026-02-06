@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import Header from '../components/Header';
 import Footer from '../components/Footer';
-import Sidebar from '../components/Sidebar';
 import '../styles/pages/MyLettersPage.css';
 import { AuthContext } from '../context/AuthContext';
 import MessageModal from '../components/MessageModel';
@@ -57,7 +55,7 @@ function MyLettersPage() {
         }
         const lettersData = await lettersResponse.json();
         setLetters(lettersData);
-        
+
         // Fetch Leave Requests
         if (user.role !== 'Student') {
           const leaveRequestsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/leaverequests/byUser/${user._id}`, { headers });
@@ -97,8 +95,8 @@ function MyLettersPage() {
       <div className="dashboard-container">
         <div className="approvals-layout">
           <main className="letter-content">
-          <div className="letter-contenter">
-            <div className="loading">Loading your requests...</div>
+            <div className="letter-contenter">
+              <div className="loading">Loading your requests...</div>
             </div>
           </main>
         </div>
@@ -112,7 +110,7 @@ function MyLettersPage() {
       <div className="approvals-layout">
         <main className="letter-content">
           <div className="letter-contenter">
-            
+
             {/* --- Letters Table --- */}
             <div className="recent-letters">
               <h2>My Submitted Letters</h2>

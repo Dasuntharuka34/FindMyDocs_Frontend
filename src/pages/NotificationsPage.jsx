@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/pages/NotificationsPage.css';
-import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
 import Footer from '../components/Footer';
 
 // Define these constants at the top of the file
@@ -29,7 +27,7 @@ const NotificationsPage = () => {
   const [notificationToDelete, setNotificationToDelete] = useState(null);
 
   // Fetch all notifications
-  const fetchNotifications = async () => {
+  const fetchNotifications = React.useCallback(async () => {
     if (!user || !user._id) return;
 
     try {
@@ -48,7 +46,7 @@ const NotificationsPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, token]);
 
   // Mark a single notification as read
   const markAsRead = async (notificationId) => {
@@ -75,13 +73,13 @@ const NotificationsPage = () => {
   // Mark all notifications as read
   const markAllAsRead = async () => {
     if (!user || !user._id) return;
-    
+
     try {
       // Get all unread notifications
       const unreadNotifications = notifications.filter(notification => !notification.read);
-      
+
       // Mark each unread notification as read
-      const markPromises = unreadNotifications.map(notification => 
+      const markPromises = unreadNotifications.map(notification =>
         fetch(`${process.env.REACT_APP_BACKEND_URL}/api/notifications/${notification._id}/read`, {
           method: 'PUT',
           headers: {
@@ -90,10 +88,10 @@ const NotificationsPage = () => {
           },
         })
       );
-      
+
       // Wait for all requests to complete
       await Promise.all(markPromises);
-      
+
       // Refresh notifications after marking all as read
       fetchNotifications();
     } catch (error) {
@@ -128,7 +126,7 @@ const NotificationsPage = () => {
   // Delete all notifications
   const deleteAllNotifications = async () => {
     if (!user || !user._id) return;
-    
+
     try {
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/notifications/byUser/${user._id}`, {
         method: 'DELETE',
@@ -170,7 +168,7 @@ const NotificationsPage = () => {
 
   useEffect(() => {
     fetchNotifications();
-  }, [user]);
+  }, [user, fetchNotifications]);
 
   if (isLoading) {
     return (
@@ -211,7 +209,7 @@ const NotificationsPage = () => {
             <div className="notifications-summary">
               <p>You have {notifications.length} notifications ({unreadCount} unread)</p>
             </div>
-            
+
             <ul className="notifications-list">
               {notifications.map((notification) => (
                 <li
@@ -222,7 +220,7 @@ const NotificationsPage = () => {
                     color: alertTextColors[notification.type] || '#333'
                   }}
                 >
-                  <div 
+                  <div
                     className="notification-content"
                     onClick={() => !notification.read && markAsRead(notification._id)}
                   >
@@ -234,7 +232,7 @@ const NotificationsPage = () => {
                       </div>
                     )}
                   </div>
-                  <button 
+                  <button
                     className="delete-notification-btn"
                     onClick={() => confirmDelete(notification)}
                     title="Delete notification"
@@ -256,13 +254,13 @@ const NotificationsPage = () => {
             <h3>Delete Notification</h3>
             <p>Are you sure you want to delete this notification?</p>
             <div className="modal-actions">
-              <button 
+              <button
                 className="confirm-delete-btn"
                 onClick={() => deleteNotification(notificationToDelete._id)}
               >
                 Yes, Delete
               </button>
-              <button 
+              <button
                 className="cancel-delete-btn"
                 onClick={cancelDelete}
               >
@@ -280,13 +278,13 @@ const NotificationsPage = () => {
             <h3>Delete All Notifications</h3>
             <p>Are you sure you want to delete all {notifications.length} notifications? This action cannot be undone.</p>
             <div className="modal-actions">
-              <button 
+              <button
                 className="confirm-delete-all-btn"
                 onClick={deleteAllNotifications}
               >
                 Yes, Delete All
               </button>
-              <button 
+              <button
                 className="cancel-delete-btn"
                 onClick={cancelDelete}
               >

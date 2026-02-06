@@ -28,10 +28,9 @@ import ViewFormPage from './pages/admin/ViewFormPage';
 import EditFormPage from './pages/admin/EditFormPage';
 import AvailableFormsPage from './pages/AvailableFormsPage';
 import RenderFormPage from './pages/RenderFormPage';
-import MySubmissionsPage from './pages/MySubmissionsPage';
 import ReportGenerationPage from './pages/admin/ReportGenerationPage';
 import ContactSupportPage from './pages/ContactSupportPage';
-import { ThemeProvider } from './context/ThemeContext';
+
 import AutoLogout from './components/AutoLogout';
 
 
@@ -44,7 +43,7 @@ const PrivateRoute = ({ children, allowedRoles }) => {
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    return <p style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>Access Denied! You do not have permission to view this page.</p>;
+    return <p style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red' }}>Access Denied! You do not have permission to view this page.</p>;
   }
 
   return children;
@@ -66,7 +65,7 @@ function App() {
 
         {/* Protected Routes */}
         <Route path="/dashboard" element={
-          <PrivateRoute allowedRoles={['Student','Lecturer', 'HOD', 'Dean', 'VC']}>
+          <PrivateRoute allowedRoles={['Student', 'Lecturer', 'HOD', 'Dean', 'VC']}>
             <UserLayout>
               <Dashboard />
             </UserLayout>
@@ -162,7 +161,7 @@ function App() {
         } />
 
         <Route path="/excuse-request" element={
-          <PrivateRoute allowedRoles={['Student','Lecturer', 'HOD', 'Dean', 'VC']}>
+          <PrivateRoute allowedRoles={['Student', 'Lecturer', 'HOD', 'Dean', 'VC']}>
             <UserLayout>
               <ExcuseRequestForm />
             </UserLayout>
@@ -178,7 +177,7 @@ function App() {
         } />
 
         <Route path="/my-letters" element={
-          <PrivateRoute allowedRoles={['Student','Lecturer', 'HOD', 'Dean', 'VC']}>
+          <PrivateRoute allowedRoles={['Student', 'Lecturer', 'HOD', 'Dean', 'VC']}>
             <UserLayout>
               <MyLettersPage />
             </UserLayout>
@@ -186,7 +185,7 @@ function App() {
         } />
 
         <Route path="/available-forms" element={
-          <PrivateRoute allowedRoles={['Student','Lecturer', 'HOD', 'Dean', 'VC']}>
+          <PrivateRoute allowedRoles={['Student', 'Lecturer', 'HOD', 'Dean', 'VC']}>
             <UserLayout>
               <AvailableFormsPage />
             </UserLayout>
@@ -194,7 +193,7 @@ function App() {
         } />
 
         <Route path="/fill-form/:id" element={
-          <PrivateRoute allowedRoles={['Student','Lecturer', 'HOD', 'Dean', 'VC']}>
+          <PrivateRoute allowedRoles={['Student', 'Lecturer', 'HOD', 'Dean', 'VC']}>
             <UserLayout>
               <RenderFormPage />
             </UserLayout>
@@ -270,7 +269,7 @@ function App() {
         <Route path="/contact-support" element={<ContactSupportPage />} />
 
         {/* Catch-all route for 404 - Not Found */}
-        <Route path="*" element={<p style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem'}}>404 - Page Not Found</p>} />
+        <Route path="*" element={<p style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem' }}>404 - Page Not Found</p>} />
       </Routes>
     </Router>
   );

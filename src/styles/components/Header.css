@@ -1,13 +1,19 @@
 .header {
   display: flex;
-  justify-content: space-between; /* logo + name left | user info right */
+  justify-content: space-between;
+  /* logo + name left | user info right */
   align-items: center;
   padding: 0 20px;
-  background-color: #d8e5f8; /* light blue */
+  background-color: #d8e5f8;
+  /* light blue */
   border-bottom: 1px solid #aac4f8;
   box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
   height: 60px;
-  position: relative; /* prevents overrides messing with layout */
+  position: fixed;
+  /* Fixed position at the top */
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
 }
 
@@ -27,7 +33,8 @@
   font-weight: 700;
   font-size: 1.3rem;
   color: var(--header-text);
-  margin: 0; /* ensure no extra spacing */
+  margin: 0;
+  /* ensure no extra spacing */
   line-height: 1;
 }
 
@@ -56,5 +63,6 @@
 }
 
 .logout-btn:hover {
-  background-color: #d32f2f; /* darker red for hover */
+  background-color: #d32f2f;
+  /* darker red for hover */
 }

@@ -52,7 +52,7 @@ export default function UserManagementPage() {
     setMessageModal({ show: false, title: '', message: '' });
   };
 
-  const fetchApprovedUsers = async () => {
+  const fetchApprovedUsers = React.useCallback(async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users`, {
         headers: {
@@ -68,13 +68,13 @@ export default function UserManagementPage() {
       console.error("Error fetching approved users:", error);
       setMessageModal({ show: true, title: 'Error', message: `Failed to load approved users: ${error.message}`, onConfirm: closeMessageModal });
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (token) {
       fetchApprovedUsers();
     }
-  }, [token]);
+  }, [token, fetchApprovedUsers]);
 
   const handleEditUser = async (userToEdit) => {
     const newName = prompt(`Edit name for ${userToEdit.name}:`, userToEdit.name);
@@ -164,74 +164,74 @@ export default function UserManagementPage() {
   };
 
   if (!user || user.role !== 'Admin') {
-    return <p style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>Access Denied! You do not have administrator privileges.</p>;
+    return <p style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red' }}>Access Denied! You do not have administrator privileges.</p>;
   }
 
   return (
     <div className="admin-dashboard">
 
-        <section className="admin-section">
-          <h3>👥 Approved Users ({approvedUsers.length})</h3>
-          <div className="requests-controls">
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-            <select
-              value={`${sortField}-${sortOrder}`}
-              onChange={(e) => {
-                const [field, order] = e.target.value.split('-');
-                setSortField(field);
-                setSortOrder(order);
-              }}
-              className="sort-select"
-            >
-              <option value="name-asc">Name (A-Z)</option>
-              <option value="name-desc">Name (Z-A)</option>
-              <option value="email-asc">Email (A-Z)</option>
-              <option value="email-desc">Email (Z-A)</option>
-              <option value="role-asc">Role (A-Z)</option>
-              <option value="role-desc">Role (Z-A)</option>
-            </select>
-          </div>
-          {applyFiltersAndSorting(approvedUsers).length === 0 ? (
-            <p>No approved users found.</p>
-          ) : (
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Action</th>
+      <section className="admin-section">
+        <h3>👥 Approved Users ({approvedUsers.length})</h3>
+        <div className="requests-controls">
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+          <select
+            value={`${sortField}-${sortOrder}`}
+            onChange={(e) => {
+              const [field, order] = e.target.value.split('-');
+              setSortField(field);
+              setSortOrder(order);
+            }}
+            className="sort-select"
+          >
+            <option value="name-asc">Name (A-Z)</option>
+            <option value="name-desc">Name (Z-A)</option>
+            <option value="email-asc">Email (A-Z)</option>
+            <option value="email-desc">Email (Z-A)</option>
+            <option value="role-asc">Role (A-Z)</option>
+            <option value="role-desc">Role (Z-A)</option>
+          </select>
+        </div>
+        {applyFiltersAndSorting(approvedUsers).length === 0 ? (
+          <p>No approved users found.</p>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {applyFiltersAndSorting(approvedUsers).map(approvedUser => (
+                <tr key={approvedUser._id}>
+                  <td>{approvedUser.name}</td>
+                  <td>{approvedUser.email}</td>
+                  <td>{approvedUser.role}</td>
+                  <td>
+                    <button onClick={() => handleEditUser(approvedUser)} className="edit-btn">Edit</button>
+                    <button onClick={() => handleDeleteUser(approvedUser._id, approvedUser.name)} className="delete-btn">Delete</button>
+                    <button onClick={() => handleResetPassword(approvedUser._id, approvedUser.name)} className="reset-password-btn">Reset Password</button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {applyFiltersAndSorting(approvedUsers).map(approvedUser => (
-                  <tr key={approvedUser._id}>
-                    <td>{approvedUser.name}</td>
-                    <td>{approvedUser.email}</td>
-                    <td>{approvedUser.role}</td>
-                    <td>
-                      <button onClick={() => handleEditUser(approvedUser)} className="edit-btn">Edit</button>
-                      <button onClick={() => handleDeleteUser(approvedUser._id, approvedUser.name)} className="delete-btn">Delete</button>
-                      <button onClick={() => handleResetPassword(approvedUser._id, approvedUser.name)} className="reset-password-btn">Reset Password</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </section>
-        <MessageModal
-          show={messageModal.show}
-          title={messageModal.title}
-          message={messageModal.message}
-          onConfirm={messageModal.onConfirm}
-        />
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+      <MessageModal
+        show={messageModal.show}
+        title={messageModal.title}
+        message={messageModal.message}
+        onConfirm={messageModal.onConfirm}
+      />
     </div>
   );
 }

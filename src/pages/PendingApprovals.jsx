@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import Header from '../components/Header';
 import Footer from '../components/Footer';
-import Sidebar from '../components/Sidebar';
 import '../styles/pages/PendingApprovals.css';
 import { AuthContext } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
@@ -80,7 +78,7 @@ function PendingApprovals() {
     setMessageModal({ show: false, title: '', message: '' });
   };
 
-  const fetchPendingExcuseRequests = async () => {
+  const fetchPendingExcuseRequests = React.useCallback(async () => {
     if (!user || !user.role) return;
     const targetStageIndex = approverRoleToStageIndex[user.role];
     if (targetStageIndex === undefined) {
@@ -103,9 +101,9 @@ function PendingApprovals() {
       console.error("Error fetching pending excuse requests:", error);
       setMessageModal({ show: true, title: 'Error', message: `Failed to load excuse requests: ${error.message}`, onConfirm: closeMessageModal });
     }
-  };
+  }, [user, token]);
 
-  const fetchPendingLeaveRequests = async () => {
+  const fetchPendingLeaveRequests = React.useCallback(async () => {
     if (!user || !user.role) return;
     const targetStageIndex = approverRoleToStageIndex[user.role];
     if (targetStageIndex === undefined) {
@@ -128,9 +126,9 @@ function PendingApprovals() {
       console.error("Error fetching pending leave requests:", error);
       setMessageModal({ show: true, title: 'Error', message: `Failed to load leave requests: ${error.message}`, onConfirm: closeMessageModal });
     }
-  };
+  }, [user, token]);
 
-  const fetchPendingOtherLetterRequests = async () => {
+  const fetchPendingOtherLetterRequests = React.useCallback(async () => {
     if (!user || !user.role) return;
     const targetStageIndex = approverRoleToStageIndex[user.role];
     if (targetStageIndex === undefined) {
@@ -138,7 +136,7 @@ function PendingApprovals() {
       return;
     }
     // Assuming 'Letter' requests follow the same approval stages as 'LeaveRequest'
-    const targetStatusName = approvalStages.LeaveRequest[targetStageIndex].name; 
+    const targetStatusName = approvalStages.LeaveRequest[targetStageIndex].name;
     try {
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/letters/pendingApprovals/${targetStatusName}`, {
         headers: {
@@ -154,7 +152,7 @@ function PendingApprovals() {
       console.error("Error fetching pending other letter requests:", error);
       setMessageModal({ show: true, title: 'Error', message: `Failed to load other letter requests: ${error.message}`, onConfirm: closeMessageModal });
     }
-  };
+  }, [user, token]);
 
   useEffect(() => {
     if (user && user.role) {
@@ -162,7 +160,7 @@ function PendingApprovals() {
       fetchPendingLeaveRequests();
       fetchPendingOtherLetterRequests();
     }
-  }, [user]);
+  }, [user, fetchPendingExcuseRequests, fetchPendingLeaveRequests, fetchPendingOtherLetterRequests]);
 
   const handleApproval = async (request, action, reason = '') => {
     if (!user || !user.name || !user.role || !user._id) {
@@ -173,7 +171,7 @@ function PendingApprovals() {
     try {
       const isLeaveRequest = request.type === "LeaveRequest";
       const isOtherLetterRequest = request.type === "Letter";
-      
+
       // --- FIX START: Include approverId in request body ---
       let apiEndpoint;
       let requestBody;
@@ -181,7 +179,7 @@ function PendingApprovals() {
       if (isLeaveRequest) {
         if (action === 'approve') {
           apiEndpoint = `${process.env.REACT_APP_BACKEND_URL}/api/leaverequests/${request._id}/approve`;
-          requestBody = { 
+          requestBody = {
             approverRole: user.role,
             approverId: user._id // Added approverId
           };
@@ -191,19 +189,19 @@ function PendingApprovals() {
             return;
           }
           apiEndpoint = `${process.env.REACT_APP_BACKEND_URL}/api/leaverequests/${request._id}/reject`;
-          requestBody = { 
+          requestBody = {
             approverRole: user.role,
             approverId: user._id, // Added approverId
-            rejectionReason: reason 
+            rejectionReason: reason
           };
         }
       } else if (isOtherLetterRequest) { // Handle other letter requests
         if (action === 'approve') {
           apiEndpoint = `${process.env.REACT_APP_BACKEND_URL}/api/letters/${request._id}/status`;
-          requestBody = { 
+          requestBody = {
             status: 'approved',
             approverRole: user.role,
-            approverId: user._id 
+            approverId: user._id
           };
         } else if (action === 'reject') {
           if (reason.trim() === '') {
@@ -211,19 +209,19 @@ function PendingApprovals() {
             return;
           }
           apiEndpoint = `${process.env.REACT_APP_BACKEND_URL}/api/letters/${request._id}/status`;
-          requestBody = { 
+          requestBody = {
             status: 'rejected',
             approverRole: user.role,
-            approverId: user._id, 
-            comment: reason 
+            approverId: user._id,
+            comment: reason
           };
         }
       }
-      else { 
+      else {
         // For excuse requests
         if (action === 'approve') {
           apiEndpoint = `${process.env.REACT_APP_BACKEND_URL}/api/excuserequests/${request._id}/approve`;
-          requestBody = { 
+          requestBody = {
             approverRole: user.role,
             approverId: user._id // Added approverId
           };
@@ -233,10 +231,10 @@ function PendingApprovals() {
             return;
           }
           apiEndpoint = `${process.env.REACT_APP_BACKEND_URL}/api/excuserequests/${request._id}/reject`;
-          requestBody = { 
+          requestBody = {
             approverRole: user.role,
             approverId: user._id, // Added approverId
-            comment: reason 
+            comment: reason
           };
         }
       }
@@ -244,7 +242,7 @@ function PendingApprovals() {
 
       const response = await fetch(apiEndpoint, {
         method: 'PUT',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
@@ -266,11 +264,11 @@ function PendingApprovals() {
       }
 
       // Show success message and reset state
-      setMessageModal({ 
-          show: true, 
-          title: 'Success', 
-          message: `Request for ${isLeaveRequest ? request.studentName : request.studentName} has been ${action}d successfully.`, 
-          onConfirm: closeMessageModal 
+      setMessageModal({
+        show: true,
+        title: 'Success',
+        message: `Request for ${isLeaveRequest ? request.studentName : request.studentName} has been ${action}d successfully.`,
+        onConfirm: closeMessageModal
       });
 
       setSelectedRequest(null);
@@ -297,158 +295,158 @@ function PendingApprovals() {
     return <p style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red' }}>Access Denied! You do not have permission to view pending approvals.</p>;
   }
 
-  const allRequests = [...excuseRequests, ...leaveRequests];
+
 
   return (
     <div className="pending-approvals-container">
       <div className="approvals-layout">
         <div className="approvals-content">
           <section>
-          <h2>Pending Approvals</h2>
+            <h2>Pending Approvals</h2>
 
-          {/* --- Excuse Requests Table --- */}
-          <div className="approvals-section">
-            <h3>Excuse Requests</h3>
-            {excuseRequests.length === 0 ? (
-              <p>No pending excuse requests.</p>
-            ) : (
-              <table className="approvals-table">
-                <thead>
-                  <tr>
-                    <th>Requester</th>
-                    <th>Submitted On</th>
-                    <th>Status</th>
-                    <th>View Details</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {excuseRequests.map(request => (
-                    <tr key={request._id}>
-                      <td>{request.studentName}</td>
-                      <td>{request.submittedDate ? new Date(request.submittedDate).toLocaleDateString() : 'N/A'}</td>
-                      <td>
-                        <span className={`status-badge ${request.status ? request.status.toLowerCase().replace(/\s/g, '-') : ''}`}>
-                          {request.status}
-                        </span>
-                      </td>
-                      <td>
-                        <Link to={`/excuse-request/${request._id}`} className="view-details-btn">
-                          View Details
-                        </Link>
-                      </td>
-                      <td>
-                        {request.status === approvalStages.ExcuseRequest[approverRoleToStageIndex[user.role]]?.name && (
+            {/* --- Excuse Requests Table --- */}
+            <div className="approvals-section">
+              <h3>Excuse Requests</h3>
+              {excuseRequests.length === 0 ? (
+                <p>No pending excuse requests.</p>
+              ) : (
+                <table className="approvals-table">
+                  <thead>
+                    <tr>
+                      <th>Requester</th>
+                      <th>Submitted On</th>
+                      <th>Status</th>
+                      <th>View Details</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {excuseRequests.map(request => (
+                      <tr key={request._id}>
+                        <td>{request.studentName}</td>
+                        <td>{request.submittedDate ? new Date(request.submittedDate).toLocaleDateString() : 'N/A'}</td>
+                        <td>
+                          <span className={`status-badge ${request.status ? request.status.toLowerCase().replace(/\s/g, '-') : ''}`}>
+                            {request.status}
+                          </span>
+                        </td>
+                        <td>
+                          <Link to={`/excuse-request/${request._id}`} className="view-details-btn">
+                            View Details
+                          </Link>
+                        </td>
+                        <td>
+                          {request.status === approvalStages.ExcuseRequest[approverRoleToStageIndex[user.role]]?.name && (
                             <>
                               <button onClick={() => confirmAndHandle(request, 'approve')} className="approve-btn">Approve</button>
                               <button onClick={() => confirmAndHandle(request, 'reject')} className="reject-btn">Reject</button>
                             </>
                           )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </section>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </section>
 
           <br />
-            <section>
-          {/* --- Leave Requests Table --- */}
-          <div className="approvals-section">
-            <h3>Leave Requests</h3>
-            {leaveRequests.length === 0 ? (
-              <p>No pending leave requests.</p>
-            ) : (
-              <table className="approvals-table">
-                <thead>
-                  <tr>
-                    <th>Requester</th>
-                    <th>Submitted On</th>
-                    <th>Status</th>
-                    <th>View Details</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {leaveRequests.map(request => (
-                    <tr key={request._id}>
-                      <td>{request.studentName}</td>
-                      <td>{request.submittedDate ? new Date(request.submittedDate).toLocaleDateString() : 'N/A'}</td>
-                      <td>
-                        <span className={`status-badge ${request.status ? request.status.toLowerCase().replace(/\s/g, '-') : ''}`}>
-                          {request.status}
-                        </span>
-                      </td>
-                      <td>
-                        <Link to={`/leave-request/${request._id}`} className="view-details-btn">
-                          View Details
-                        </Link>
-                      </td>
-                      <td>
-                        {request.status === approvalStages.LeaveRequest[approverRoleToStageIndex[user.role]]?.name && (
+          <section>
+            {/* --- Leave Requests Table --- */}
+            <div className="approvals-section">
+              <h3>Leave Requests</h3>
+              {leaveRequests.length === 0 ? (
+                <p>No pending leave requests.</p>
+              ) : (
+                <table className="approvals-table">
+                  <thead>
+                    <tr>
+                      <th>Requester</th>
+                      <th>Submitted On</th>
+                      <th>Status</th>
+                      <th>View Details</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leaveRequests.map(request => (
+                      <tr key={request._id}>
+                        <td>{request.studentName}</td>
+                        <td>{request.submittedDate ? new Date(request.submittedDate).toLocaleDateString() : 'N/A'}</td>
+                        <td>
+                          <span className={`status-badge ${request.status ? request.status.toLowerCase().replace(/\s/g, '-') : ''}`}>
+                            {request.status}
+                          </span>
+                        </td>
+                        <td>
+                          <Link to={`/leave-request/${request._id}`} className="view-details-btn">
+                            View Details
+                          </Link>
+                        </td>
+                        <td>
+                          {request.status === approvalStages.LeaveRequest[approverRoleToStageIndex[user.role]]?.name && (
                             <>
                               <button onClick={() => confirmAndHandle({ ...request, type: "LeaveRequest" }, 'approve')} className="approve-btn">Approve</button>
                               <button onClick={() => confirmAndHandle({ ...request, type: "LeaveRequest" }, 'reject')} className="reject-btn">Reject</button>
                             </>
                           )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </section>
 
           <br />
-            <section>
-          {/* --- Other Letters Table --- */}
-          <div className="approvals-section">
-            <h3>Other Letters</h3>
-            {otherLetterRequests.length === 0 ? (
-              <p>No pending other letter requests.</p>
-            ) : (
-              <table className="approvals-table">
-                <thead>
-                  <tr>
-                    <th>Requester</th>
-                    <th>Submitted On</th>
-                    <th>Status</th>
-                    <th>View Details</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {otherLetterRequests.map(request => (
-                    <tr key={request._id}>
-                      <td>{request.student}</td>
-                      <td>{request.submittedDate ? new Date(request.submittedDate).toLocaleDateString() : 'N/A'}</td>
-                      <td>
-                        <span className={`status-badge ${request.status ? request.status.toLowerCase().replace(/\s/g, '-') : ''}`}>
-                          {request.status}
-                        </span>
-                      </td>
-                      <td>
-                        <Link to={`/documents/${request._id}`} className="view-details-btn">
-                          View Details
-                        </Link>
-                      </td>
-                      <td>
-                        {request.status === approvalStages.LeaveRequest[approverRoleToStageIndex[user.role]]?.name && (
+          <section>
+            {/* --- Other Letters Table --- */}
+            <div className="approvals-section">
+              <h3>Other Letters</h3>
+              {otherLetterRequests.length === 0 ? (
+                <p>No pending other letter requests.</p>
+              ) : (
+                <table className="approvals-table">
+                  <thead>
+                    <tr>
+                      <th>Requester</th>
+                      <th>Submitted On</th>
+                      <th>Status</th>
+                      <th>View Details</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {otherLetterRequests.map(request => (
+                      <tr key={request._id}>
+                        <td>{request.student}</td>
+                        <td>{request.submittedDate ? new Date(request.submittedDate).toLocaleDateString() : 'N/A'}</td>
+                        <td>
+                          <span className={`status-badge ${request.status ? request.status.toLowerCase().replace(/\s/g, '-') : ''}`}>
+                            {request.status}
+                          </span>
+                        </td>
+                        <td>
+                          <Link to={`/documents/${request._id}`} className="view-details-btn">
+                            View Details
+                          </Link>
+                        </td>
+                        <td>
+                          {request.status === approvalStages.LeaveRequest[approverRoleToStageIndex[user.role]]?.name && (
                             <>
                               <button onClick={() => confirmAndHandle({ ...request, type: "Letter" }, 'approve')} className="approve-btn">Approve</button>
                               <button onClick={() => confirmAndHandle({ ...request, type: "Letter" }, 'reject')} className="reject-btn">Reject</button>
                             </>
                           )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </section>
         </div>
       </div>

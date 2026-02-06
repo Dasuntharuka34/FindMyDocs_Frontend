@@ -73,7 +73,7 @@ const ExcuseRequestView = () => {
 
         // Generate history from approvals array
         const generatedHistory = [];
-        
+
         // Add initial submission
         generatedHistory.push({
           stage: 0,
@@ -112,8 +112,8 @@ const ExcuseRequestView = () => {
         }
 
         // Add current status if not already in history
-        if (fetchedRequest.status !== "Submitted" && 
-            !generatedHistory.some(item => item.status === fetchedRequest.status)) {
+        if (fetchedRequest.status !== "Submitted" &&
+          !generatedHistory.some(item => item.status === fetchedRequest.status)) {
           generatedHistory.push({
             stage: fetchedRequest.currentStageIndex,
             status: fetchedRequest.status,
@@ -134,23 +134,23 @@ const ExcuseRequestView = () => {
     };
 
     fetchExcuseRequestDetails();
-  }, [id, user]);
+  }, [id, user, token]);
 
   if (loading) {
     return (
-      <p style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem'}}>Loading excuse request details...</p>
+      <p style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem' }}>Loading excuse request details...</p>
     );
   }
 
   if (error) {
     return (
-      <div className="error-message" style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>{error}</div>
+      <div className="error-message" style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red' }}>{error}</div>
     );
   }
 
   if (!excuseRequest) {
     return (
-      <div className="error-message" style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>Excuse request not found.</div>
+      <div className="error-message" style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red' }}>Excuse request not found.</div>
     );
   }
 
@@ -159,7 +159,7 @@ const ExcuseRequestView = () => {
       <div className="excuse-request-header-row">
         <h1>Excuse Request Details</h1>
       </div>
-      
+
       <div className="excuse-request-info">
         <h3>Basic Information</h3>
         <div className="info-grid">

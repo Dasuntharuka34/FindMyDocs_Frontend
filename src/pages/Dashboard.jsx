@@ -2,8 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import RecentLetters from '../components/RecentLetters';
 import NotificationsWidget from '../components/NotificationsWidget';
 import NewLetterModal from '../components/NewLetterModal';
-import ExcuseRequestForm from '../forms/ExcuseRequestForm';
-import LeaveRequestForm from '../forms/LeaveRequestForm'; // Import the new component
+
 import { AuthContext } from '../context/AuthContext';
 import MessageModal from '../components/MessageModel';
 
@@ -29,13 +28,12 @@ const submitterRoleToInitialStageIndex = {
 
 function Dashboard() {
   const { user, token } = useContext(AuthContext);
-  
-  const [currentStage, setCurrentStage] = useState(0);
+
+
   const [letters, setLetters] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [showExcuseRequestModal, setShowExcuseRequestModal] = useState(false);
-  const [showLeaveRequestModal, setShowLeaveRequestModal] = useState(false); // New state for Leave Request Modal
+
 
   const [messageModal, setMessageModal] = useState({ show: false, title: '', message: '' });
 
@@ -43,7 +41,7 @@ function Dashboard() {
     setMessageModal({ show: false, title: '', message: '' });
   };
 
-  const fetchLetters = async () => {
+  const fetchLetters = React.useCallback(async () => {
     if (!user || !user._id) return;
 
     try {
@@ -58,22 +56,15 @@ function Dashboard() {
       const data = await response.json();
       setLetters(data);
 
-      if (data.length > 0) {
-        const latestLetter = data.reduce((prev, current) => 
-          (prev.currentStageIndex > current.currentStageIndex) ? prev : current
-        );
-        setCurrentStage(Math.min(latestLetter.currentStageIndex || 0, approvalStages.length - 1));
-      } else {
-        setCurrentStage(0);
-      }
+
 
     } catch (error) {
       console.error("Error fetching letters:", error);
       setMessageModal({ show: true, title: 'Error', message: `Failed to load letters: ${error.message}`, onConfirm: closeMessageModal });
     }
-  };
+  }, [user, token]);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = React.useCallback(async () => {
     if (!user || !user._id) return;
 
     try {
@@ -91,14 +82,14 @@ function Dashboard() {
       console.error("Error fetching notifications:", error);
       setMessageModal({ show: true, title: 'Error', message: `Failed to load notifications: ${error.message}`, onConfirm: closeMessageModal });
     }
-  };
+  }, [user, token]);
 
   useEffect(() => {
     if (user && user._id) {
       fetchLetters();
       fetchNotifications();
     }
-  }, [user]);
+  }, [user, fetchLetters, fetchNotifications]);
 
   // Handle new letter submit (for non-Medical Certificate/Leave Request letters)
   const addLetter = async (newLetterData) => {
@@ -140,7 +131,7 @@ function Dashboard() {
       }
 
       fetchLetters();
-      
+
       await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/notifications`, {
         method: 'POST',
         headers: {
@@ -165,30 +156,9 @@ function Dashboard() {
     }
   };
 
-  // Function to open Excuse Request Modal
-  const openExcuseRequestFormModal = () => {
-    setShowExcuseRequestModal(true);
-  };
 
-  // Function to close Excuse Request Modal (and refresh data if needed)
-  const closeExcuseRequestFormModal = () => {
-    setShowExcuseRequestModal(false);
-    fetchLetters();
-  };
 
-  // Function to open Leave Request Modal
-  const openLeaveRequestFormModal = () => {
-    setShowLeaveRequestModal(true);
-  };
 
-  // Function to close Leave Request Modal (and refresh data if needed)
-  const closeLeaveRequestFormModal = () => {
-    setShowLeaveRequestModal(false);
-    // You should have a separate fetch function for leave requests here
-    // or refactor fetchLetters to also fetch leave requests and merge them.
-    // For now, let's just refresh the letter list.
-    fetchLetters();
-  };
 
   if (!user) {
     return <p>Loading user data...</p>;
@@ -198,9 +168,9 @@ function Dashboard() {
     <main className="main-content">
       <section className="top-widgets">
         {/* <ProgressTracker stages={approvalStages.map(s => s.name)} currentStage={currentStage} /> */}
-        <NotificationsWidget 
-          notifications={notifications} 
-          onNotificationUpdate={fetchNotifications} 
+        <NotificationsWidget
+          notifications={notifications}
+          onNotificationUpdate={fetchNotifications}
         />
       </section>
 
@@ -217,8 +187,7 @@ function Dashboard() {
         </div>
       </section>
       {modalOpen && <NewLetterModal user={user} onClose={() => setModalOpen(false)} onSubmit={addLetter} />}
-      {showExcuseRequestModal && <ExcuseRequestForm onClose={closeExcuseRequestFormModal} />}
-      {showLeaveRequestModal && <LeaveRequestForm onClose={closeLeaveRequestFormModal} />} {/* Render the Leave Request Form */}
+
 
       <MessageModal
         show={messageModal.show}
