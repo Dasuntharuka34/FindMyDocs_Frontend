@@ -225,6 +225,16 @@ const ReportGenerationPage = () => {
       return renderTable(reportData, 'Excuse Requests', 'requests');
     }
 
+    if (reportType === 'approvedRequests') {
+      return (
+        <>
+          {renderTable(reportData.formSubmissions, 'Approved Form Submissions', 'submissions')}
+          {renderTable(reportData.leaveRequests, 'Approved Leave Requests', 'requests')}
+          {renderTable(reportData.excuseRequests, 'Approved Excuse Requests', 'requests')}
+        </>
+      );
+    }
+
     return null;
   };
 
@@ -275,6 +285,7 @@ const ReportGenerationPage = () => {
                 <MenuItem value="formSubmissions">Form Submissions</MenuItem>
                 <MenuItem value="leaveRequests">Leave Requests</MenuItem>
                 <MenuItem value="excuseRequests">Excuse Requests</MenuItem>
+                <MenuItem value="approvedRequests">Approved Requests</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -310,7 +321,7 @@ const ReportGenerationPage = () => {
             <Button
               startIcon={<DownloadIcon />}
               onClick={() => {
-                if (reportType === 'all') {
+                if (reportType === 'all' || reportType === 'approvedRequests') {
                   downloadCSV(reportData.formSubmissions, 'Form_Submissions.csv');
                   downloadCSV(reportData.leaveRequests, 'Leave_Requests.csv');
                   downloadCSV(reportData.excuseRequests, 'Excuse_Requests.csv');

@@ -1,41 +1,194 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Grid,
+  MenuItem,
+  CircularProgress,
+  IconButton,
+  Typography,
+  Box
+} from '@mui/material';
+import { Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon, LockReset as ResetIcon } from '@mui/icons-material';
 import { AuthContext } from '../../context/AuthContext';
 import { useRequestFilters } from '../../hooks/useRequestFilters';
 
-const MessageModal = ({ show, title, message, onConfirm, onCancel }) => {
-  if (!show) return null;
+// Custom Dialog for notifications/confirmations
+const StatusDialog = ({ open, title, message, onConfirm, onCancel, type = 'info' }) => (
+  <Dialog open={open} onClose={onCancel}>
+    <DialogTitle sx={{ fontWeight: 'bold' }}>{title}</DialogTitle>
+    <DialogContent>
+      <Typography>{message}</Typography>
+    </DialogContent>
+    <DialogActions sx={{ p: 2 }}>
+      {onCancel && <Button onClick={onCancel} color="inherit">Cancel</Button>}
+      <Button onClick={onConfirm || onCancel} variant="contained" color={type === 'error' ? 'error' : 'primary'}>
+        {onConfirm ? 'Confirm' : 'Okay'}
+      </Button>
+    </DialogActions>
+  </Dialog>
+);
+
+const EditUserModal = ({ open, user, onClose, onSave, loading }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    role: '',
+    mobile: '',
+    department: '',
+    indexNumber: '',
+    nic: ''
+  });
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        role: user.role || '',
+        mobile: user.mobile || '',
+        department: user.department || '',
+        indexNumber: user.indexNumber || '',
+        nic: user.nic || ''
+      });
+    }
+  }, [user]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal">
-        <h3>{title}</h3>
-        <p>{message}</p>
-        <div className="modal-buttons">
-          {onConfirm && (
-            <button onClick={onConfirm} className="modal-confirm-btn">
-              Yes
-            </button>
-          )}
-          {onCancel && (
-            <button onClick={onCancel} className="modal-cancel-btn">
-              No
-            </button>
-          )}
-          {(!onConfirm && !onCancel) && (
-            <button onClick={() => { /* Close logic handled by parent */ }} className="modal-okay-btn">
-              Okay
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle sx={{ fontWeight: 'bold', background: '#f5f5f5' }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          Edit User Profile
+          <IconButton onClick={onClose} size="small">
+            <CloseIcon />
+          </IconButton>
+        </Box>
+      </DialogTitle>
+      <form onSubmit={handleSubmit}>
+        <DialogContent dividers>
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                name="name"
+                label="Full Name"
+                fullWidth
+                variant="outlined"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                name="email"
+                label="Email Address"
+                fullWidth
+                variant="outlined"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                name="nic"
+                label="NIC Number"
+                fullWidth
+                variant="outlined"
+                value={formData.nic}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                name="mobile"
+                label="Mobile Number"
+                fullWidth
+                variant="outlined"
+                value={formData.mobile}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                name="role"
+                label="User Role"
+                select
+                fullWidth
+                variant="outlined"
+                value={formData.role}
+                onChange={handleChange}
+                required
+              >
+                <MenuItem value="Student">Student</MenuItem>
+                <MenuItem value="Lecturer">Lecturer</MenuItem>
+                <MenuItem value="HOD">HOD</MenuItem>
+                <MenuItem value="Dean">Dean</MenuItem>
+                <MenuItem value="Admin">Admin</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                name="department"
+                label="Department"
+                fullWidth
+                variant="outlined"
+                value={formData.department}
+                onChange={handleChange}
+              />
+            </Grid>
+            {formData.role === 'Student' && (
+              <Grid item xs={12}>
+                <TextField
+                  name="indexNumber"
+                  label="Index/Registration Number"
+                  fullWidth
+                  variant="outlined"
+                  value={formData.indexNumber}
+                  onChange={handleChange}
+                />
+              </Grid>
+            )}
+          </Grid>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, background: '#f5f5f5' }}>
+          <Button onClick={onClose} color="inherit">Cancel</Button>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={loading}
+            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
+            sx={{ px: 4 }}
+          >
+            Save Changes
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
   );
 };
 
 export default function UserManagementPage() {
-  const { user, token } = useContext(AuthContext);
+  const { user: currentUser, token } = useContext(AuthContext);
   const [approvedUsers, setApprovedUsers] = useState([]);
-  const [messageModal, setMessageModal] = useState({ show: false, title: '', message: '' });
+  const [loading, setLoading] = useState(false);
+  const [editModal, setEditModal] = useState({ open: false, user: null });
+  const [statusDialog, setStatusDialog] = useState({ open: false, title: '', message: '', type: 'info', onConfirm: null });
 
   const {
     searchTerm,
@@ -45,68 +198,83 @@ export default function UserManagementPage() {
     sortOrder,
     setSortOrder,
     applyFiltersAndSorting,
-  } = useRequestFilters('name', 'asc', ['name', 'email', 'role']);
+  } = useRequestFilters('name', 'asc', ['name', 'email', 'role', 'nic']);
 
+  const showStatus = useCallback((title, message, type = 'info', onConfirm = null) => {
+    setStatusDialog({
+      open: true,
+      title,
+      message,
+      type,
+      onConfirm: onConfirm ? async () => { await onConfirm(); closeStatus(); } : null
+    });
+  }, []);
 
-  const closeMessageModal = () => {
-    setMessageModal({ show: false, title: '', message: '' });
-  };
-
-  const fetchApprovedUsers = React.useCallback(async () => {
+  const fetchApprovedUsers = useCallback(async () => {
+    setLoading(true);
     try {
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       setApprovedUsers(data);
     } catch (error) {
       console.error("Error fetching approved users:", error);
-      setMessageModal({ show: true, title: 'Error', message: `Failed to load approved users: ${error.message}`, onConfirm: closeMessageModal });
+      showStatus('Error', `Failed to load approved users: ${error.message}`, 'error');
+    } finally {
+      setLoading(false);
     }
-  }, [token]);
+  }, [token, showStatus]);
 
   useEffect(() => {
-    if (token) {
-      fetchApprovedUsers();
-    }
+    if (token) fetchApprovedUsers();
   }, [token, fetchApprovedUsers]);
 
-  const handleEditUser = async (userToEdit) => {
-    const newName = prompt(`Edit name for ${userToEdit.name}:`, userToEdit.name);
-    if (newName !== null && newName.trim() !== '') {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/${userToEdit._id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ name: newName.trim() }),
-        });
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || `Failed to update user! status: ${response.status}`);
-        }
-        fetchApprovedUsers();
-        setMessageModal({ show: true, title: 'Success', message: `User ${userToEdit.name} updated to ${newName}.`, onConfirm: closeMessageModal });
-      } catch (error) {
-        console.error("Error editing user:", error);
-        setMessageModal({ show: true, title: 'Error', message: `Failed to edit user: ${error.message}`, onConfirm: closeMessageModal });
+  const closeStatus = () => {
+    setStatusDialog(prev => ({ ...prev, open: false }));
+  };
+
+  const handleEditClick = (userToEdit) => {
+    setEditModal({ open: true, user: userToEdit });
+  };
+
+  const handleSaveUser = async (updatedData) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/${editModal.user._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update user');
       }
+
+      await fetchApprovedUsers();
+      setEditModal({ open: false, user: null });
+      showStatus('Success', 'User profile updated successfully.');
+    } catch (error) {
+      console.error("Error editing user:", error);
+      showStatus('Error', error.message, 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleDeleteUser = async (userIdToDelete, userName) => {
-    setMessageModal({
-      show: true,
-      title: 'Confirm Deletion',
-      message: `Are you sure you want to delete user ${userName}?`,
-      onConfirm: async () => {
+  const handleDeleteUser = (userIdToDelete, userName) => {
+    showStatus(
+      'Confirm Deletion',
+      `Are you sure you want to delete user ${userName}? This action cannot be undone.`,
+      'error',
+      async () => {
         try {
           const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/${userIdToDelete}`, {
             method: 'DELETE',
@@ -116,69 +284,66 @@ export default function UserManagementPage() {
           });
           if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || `Failed to delete user! status: ${response.status}`);
+            throw new Error(errorData.message || 'Failed to delete user');
           }
-          fetchApprovedUsers();
-          setMessageModal({ show: true, title: 'Success', message: `User ${userName} deleted successfully.`, onConfirm: closeMessageModal });
+          await fetchApprovedUsers();
+          showStatus('Success', `User ${userName} deleted successfully.`);
         } catch (error) {
-          console.error("Error deleting user:", error);
-          setMessageModal({ show: true, title: 'Error', message: `Failed to delete user: ${error.message}`, onConfirm: closeMessageModal });
-        } finally {
-          closeMessageModal();
+          showStatus('Error', error.message, 'error');
         }
-      },
-      onCancel: closeMessageModal
-    });
+      }
+    );
   };
 
-  const handleResetPassword = async (userId, userName) => {
-    setMessageModal({
-      show: true,
-      title: 'Confirm Password Reset',
-      message: `Are you sure you want to reset the password for ${userName} to the default password ('password123')?`,
-      onConfirm: async () => {
+  const handleResetPassword = (userId, userName) => {
+    showStatus(
+      'Confirm Reset',
+      `Reset password for ${userName} to the default value ('password123')?`,
+      'info',
+      async () => {
         try {
           const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/${userId}/reset-password`, {
             method: 'PUT',
             headers: {
-              'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
             },
           });
           const data = await response.json();
-
-          if (response.ok) {
-            setMessageModal({ show: true, title: 'Success', message: data.message, onConfirm: closeMessageModal });
-          } else {
-            setMessageModal({ show: true, title: 'Error', message: data.message || 'Failed to reset password.' });
-          }
+          showStatus(response.ok ? 'Success' : 'Error', data.message);
         } catch (error) {
-          console.error("Error resetting password:", error);
-          setMessageModal({ show: true, title: 'Error', message: `Network error during password reset: ${error.message}`, onConfirm: closeMessageModal });
-        } finally {
-          closeMessageModal();
+          showStatus('Error', 'Network error during password reset', 'error');
         }
-      },
-      onCancel: closeMessageModal
-    });
+      }
+    );
   };
 
-  if (!user || user.role !== 'Admin') {
-    return <p style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red' }}>Access Denied! You do not have administrator privileges.</p>;
+  if (!currentUser || currentUser.role !== 'Admin') {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
+        <Typography color="error" variant="h5">Access Denied! Administrator privileges required.</Typography>
+      </Box>
+    );
   }
+
+  const filteredUsers = applyFiltersAndSorting(approvedUsers);
 
   return (
     <div className="admin-dashboard">
-
       <section className="admin-section">
-        <h3>👥 Approved Users ({approvedUsers.length})</h3>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+          <Typography variant="h4" sx={{ fontWeight: 'bold', color: "var(--text-h2)" }}>
+            👥 Approved Users ({approvedUsers.length})
+          </Typography>
+        </Box>
+
         <div className="requests-controls">
           <input
             type="text"
-            placeholder="Search users..."
+            placeholder="Search users by name, email, or NIC..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
+            style={{ flex: 1 }}
           />
           <select
             value={`${sortField}-${sortOrder}`}
@@ -197,40 +362,68 @@ export default function UserManagementPage() {
             <option value="role-desc">Role (Z-A)</option>
           </select>
         </div>
-        {applyFiltersAndSorting(approvedUsers).length === 0 ? (
-          <p>No approved users found.</p>
+
+        {filteredUsers.length === 0 ? (
+          <Box p={4} textAlign="center">
+            <Typography variant="body1" color="textSecondary">No approved users found matching your criteria.</Typography>
+          </Box>
         ) : (
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {applyFiltersAndSorting(approvedUsers).map(approvedUser => (
-                <tr key={approvedUser._id}>
-                  <td>{approvedUser.name}</td>
-                  <td>{approvedUser.email}</td>
-                  <td>{approvedUser.role}</td>
-                  <td>
-                    <button onClick={() => handleEditUser(approvedUser)} className="edit-btn">Edit</button>
-                    <button onClick={() => handleDeleteUser(approvedUser._id, approvedUser.name)} className="delete-btn">Delete</button>
-                    <button onClick={() => handleResetPassword(approvedUser._id, approvedUser.name)} className="reset-password-btn">Reset Password</button>
-                  </td>
+          <div className="table-container">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>NIC</th>
+                  <th>Role</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredUsers.map(u => (
+                  <tr key={u._id}>
+                    <td>{u.name}</td>
+                    <td>{u.email}</td>
+                    <td>{u.nic}</td>
+                    <td>{u.role}</td>
+                    <td>
+                      <Box display="flex" gap={1}>
+                        <IconButton onClick={() => handleEditClick(u)} color="primary" title="Edit User" size="small">
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton onClick={() => handleResetPassword(u._id, u.name)} color="secondary" title="Reset Password" size="small">
+                          <ResetIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton onClick={() => handleDeleteUser(u._id, u.name)} color="error" title="Delete User" size="small">
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
-      <MessageModal
-        show={messageModal.show}
-        title={messageModal.title}
-        message={messageModal.message}
-        onConfirm={messageModal.onConfirm}
+
+      {/* Modern Edit User Modal */}
+      <EditUserModal
+        open={editModal.open}
+        user={editModal.user}
+        onClose={() => setEditModal({ open: false, user: null })}
+        onSave={handleSaveUser}
+        loading={loading}
+      />
+
+      {/* Global Status/Confirm Dialog */}
+      <StatusDialog
+        open={statusDialog.open}
+        title={statusDialog.title}
+        message={statusDialog.message}
+        type={statusDialog.type}
+        onConfirm={statusDialog.onConfirm}
+        onCancel={closeStatus}
       />
     </div>
   );

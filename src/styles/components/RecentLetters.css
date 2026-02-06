@@ -1,60 +1,108 @@
 .recent-letters {
-    background-color: var(--bg-secondary);
-    padding: 20px;
-    margin-top: 20px;
-    border-radius: 8px;
-    flex: 2;
-    box-shadow: 0 0 6px rgb(0 0 0 / 0.1);
-    overflow-x: auto;
-    min-width: 320px;
-  }
-  
-  .recent-letters h2 {
-    margin-bottom: 15px;
-    color: var(--text-h2);
-  }
-  
-  table {
-    width: 90%;
-    border-collapse: collapse;
-  }
-  
-  thead, td {
-    padding: 12px 15px;
-    /* border-bottom: 1px solid #e0e0e0; */
-    text-align: left;
-    /* font-weight: 500; */
-  }
-  
-  thead {
-    background-color: var(--thead-bg);
-    color: var(--thead-text);
-    font-weight: 700;
-  }
- .recent-letters table thead tr:hover {
-    background-color: var(--thead-hover-bg);
-    cursor: default;
-    transition: background-color 0.2s ease;
+  background-color: var(--bg-secondary);
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 8px;
+  flex: 2;
+  box-shadow: 0 0 6px rgb(0 0 0 / 0.1);
+  overflow-x: auto;
+  min-width: 320px;
 }
-  .approvals-table table thead tr {
-    background-color: var(--thead-bg);
-  }
-  
-  .status-badge {
-    padding: 5px 12px;
-    border-radius: 20px;
-    color: #fff;
-    font-weight: 600;
-    font-size: 0.9rem;
-    display: inline-block;
-  }
-  
-  .recent-letters tbody tr {
-    background-color: var(--bg-primary);
-  }
 
-  .recent-letters table tbody tr:hover {
+.recent-letters h2 {
+  margin-bottom: 15px;
+  color: var(--text-h2);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead,
+td {
+  padding: 12px 15px;
+  /* border-bottom: 1px solid #e0e0e0; */
+  text-align: left;
+  /* font-weight: 500; */
+}
+
+thead {
+  background-color: var(--thead-bg);
+  color: var(--thead-text);
+  font-weight: 700;
+}
+
+.recent-letters table thead tr:hover {
+  background-color: var(--thead-hover-bg);
+  cursor: default;
+  transition: background-color 0.2s ease;
+}
+
+.approvals-table table thead tr {
+  background-color: var(--thead-bg);
+}
+
+.status-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-block;
+}
+
+.recent-letters tbody tr {
+  background-color: var(--bg-primary);
+}
+
+.recent-letters table tbody tr:hover {
   background-color: var(--bg-secondary) !important;
   cursor: pointer;
   transition: background-color 0.2s ease;
+}
+
+/* Responsive design for mobile */
+@media screen and (max-width: 768px) {
+  .recent-letters table {
+    border: 0;
+  }
+
+  .recent-letters table thead {
+    display: none;
+  }
+
+  .recent-letters table tbody tr {
+    display: block;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+    padding: 10px;
+  }
+
+  .recent-letters table tbody td {
+    display: block;
+    text-align: right;
+    padding: 8px;
+    border-bottom: 1px solid var(--border-color, #eee);
+  }
+
+  .recent-letters table tbody td:last-child {
+    border-bottom: 0;
+  }
+
+  .recent-letters table tbody td::before {
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    color: var(--text-h2);
+  }
+
+  .recent-letters table tbody td[data-label="Action"] {
+    text-align: center;
+  }
+
+  .recent-letters table tbody td[data-label="Action"]::before {
+    display: none;
+  }
 }

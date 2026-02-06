@@ -2,34 +2,38 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../utils/api';
 import { useRequestFilters } from '../../hooks/useRequestFilters';
+import {
+  IconButton,
+  Tooltip,
+  Box,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField
+} from '@mui/material';
+import {
+  Visibility as ViewIcon,
+  CheckCircle as ApproveIcon,
+  Cancel as RejectIcon
+} from '@mui/icons-material';
 
 const MessageModal = ({ show, title, message, onConfirm, onCancel }) => {
-  if (!show) return null;
-
   return (
-    <div className="modal-backdrop">
-      <div className="modal">
-        <h3>{title}</h3>
-        <p>{message}</p>
-        <div className="modal-buttons">
-          {onConfirm && (
-            <button onClick={onConfirm} className="modal-confirm-btn">
-              Yes
-            </button>
-          )}
-          {onCancel && (
-            <button onClick={onCancel} className="modal-cancel-btn">
-              No
-            </button>
-          )}
-          {(!onConfirm && !onCancel) && (
-            <button onClick={() => { /* Close logic handled by parent */ }} className="modal-okay-btn">
-              Okay
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
+    <Dialog open={show} onClose={onCancel}>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>{title}</DialogTitle>
+      <DialogContent>
+        <Typography>{message}</Typography>
+      </DialogContent>
+      <DialogActions sx={{ p: 2 }}>
+        {onCancel && <Button onClick={onCancel} color="inherit">Cancel</Button>}
+        <Button onClick={onConfirm || onCancel} variant="contained" color="primary">
+          {onConfirm ? 'Confirm' : 'Okay'}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 
@@ -170,9 +174,23 @@ export default function RegistrationApprovalPage() {
                   <td>{reg.role}</td>
                   <td>{new Date(reg.submittedAt).toLocaleDateString()}</td>
                   <td>
-                    <button onClick={() => openViewingModal(reg)} className="view-btn">View</button>
-                    <button onClick={() => openConfirmationModal(reg, 'approve')} className="approve-btn">Approve</button>
-                    <button onClick={() => openConfirmationModal(reg, 'reject')} className="reject-btn">Reject</button>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Tooltip title="View Details">
+                        <IconButton size="small" onClick={() => openViewingModal(reg)} color="primary">
+                          <ViewIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Approve">
+                        <IconButton size="small" onClick={() => openConfirmationModal(reg, 'approve')} color="success">
+                          <ApproveIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Reject">
+                        <IconButton size="small" onClick={() => openConfirmationModal(reg, 'reject')} color="error">
+                          <RejectIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </td>
                 </tr>
               ))}
@@ -192,11 +210,17 @@ export default function RegistrationApprovalPage() {
             <p><strong>Index Number:</strong> {viewingRegistration.indexNumber || 'N/A'}</p>
             <p><strong>Department:</strong> {viewingRegistration.department || 'N/A'}</p>
             <p><strong>Submitted At:</strong> {new Date(viewingRegistration.submittedAt).toLocaleString()}</p>
-            <div className="modal-buttons">
-              <button onClick={() => openConfirmationModal(viewingRegistration, 'approve')} className="approve-btn">Approve</button>
-              <button onClick={() => openConfirmationModal(viewingRegistration, 'reject')} className="reject-btn">Reject</button>
-              <button onClick={() => setViewingRegistration(null)} className="cancel-btn">Close</button>
-            </div>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+              <Button variant="contained" color="success" onClick={() => openConfirmationModal(viewingRegistration, 'approve')}>
+                Approve
+              </Button>
+              <Button variant="contained" color="error" onClick={() => openConfirmationModal(viewingRegistration, 'reject')}>
+                Reject
+              </Button>
+              <Button variant="outlined" color="inherit" onClick={() => setViewingRegistration(null)}>
+                Close
+              </Button>
+            </Box>
           </div>
         </div>
       )}
@@ -209,35 +233,38 @@ export default function RegistrationApprovalPage() {
               Are you sure you want to <strong>{confirmAction}</strong> the registration request for <strong>{confirmationRequest.name}</strong> ({confirmationRequest.email})?
             </p>
             {confirmAction === 'reject' && (
-              <div>
-                <label htmlFor="rejectionReason">Reason for Rejection (optional):</label>
-                <textarea
-                  id="rejectionReason"
+              <Box sx={{ mt: 2 }}>
+                <TextField
+                  label="Reason for Rejection (optional)"
+                  multiline
+                  rows={3}
+                  fullWidth
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
-                  rows="3"
-                  className="modal-textarea"
+                  variant="outlined"
                 />
-              </div>
+              </Box>
             )}
-            <div className="modal-buttons">
-              <button
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+              <Button
+                variant="contained"
+                color={confirmAction === 'approve' ? 'success' : 'error'}
                 onClick={() => handleRegistrationAction(confirmationRequest._id, confirmAction, rejectionReason)}
-                className={confirmAction === 'approve' ? 'approve-btn' : 'reject-btn'}
               >
                 Confirm
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="outlined"
+                color="inherit"
                 onClick={() => {
                   setConfirmationRequest(null);
                   setConfirmAction(null);
                   setRejectionReason('');
                 }}
-                className="cancel-btn"
               >
                 Cancel
-              </button>
-            </div>
+              </Button>
+            </Box>
           </div>
         </div>
       )}

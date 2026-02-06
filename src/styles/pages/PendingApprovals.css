@@ -46,7 +46,7 @@ h2 {
 }
 
 .approvals-table tbody tr:hover {
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-primary);
 }
 
 /* Status badge styling */

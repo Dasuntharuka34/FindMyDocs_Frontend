@@ -2,7 +2,8 @@
     padding: 20px;
     background-color: var(--background-color);
     color: var(--text-color);
-    min-height: calc(100vh - 60px); /* Adjust based on header/footer height */
+    min-height: calc(100vh - 60px);
+    /* Adjust based on header/footer height */
 }
 
 .all-requests-container h1 {
@@ -80,18 +81,23 @@
     background-color: var(--table-row-hover);
 }
 
-.view-button {
-    background-color: var(--button-primary-background);
-    color: var(--button-primary-text);
+.view-button,
+.view-details-btn {
+    background-color: #2196f3;
+    color: white;
     border: none;
     padding: 8px 12px;
     border-radius: 5px;
     cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 0.9em;
     transition: background-color 0.3s ease;
 }
 
-.view-button:hover {
-    background-color: var(--button-primary-hover);
+.view-button:hover,
+.view-details-btn:hover {
+    background-color: #1976d2;
 }
 
 .error-message {
@@ -107,22 +113,26 @@
 
 /* Status styles */
 .status-pending {
-    color: var(--warning-color, #ffc107); /* Default to yellow if variable not found */
+    color: var(--warning-color, #ffc107);
+    /* Default to yellow if variable not found */
     font-weight: bold;
 }
 
 .status-approved {
-    color: var(--success-color, #28a745); /* Default to green if variable not found */
+    color: var(--success-color, #28a745);
+    /* Default to green if variable not found */
     font-weight: bold;
 }
 
 .status-rejected {
-    color: var(--error-color, #dc3545); /* Default to red if variable not found */
+    color: var(--error-color, #dc3545);
+    /* Default to red if variable not found */
     font-weight: bold;
 }
 
 .status-default {
-    color: var(--text-color-secondary, #6c757d); /* Default to grey if variable not found */
+    color: var(--text-color-secondary, #6c757d);
+    /* Default to grey if variable not found */
 }
 
 

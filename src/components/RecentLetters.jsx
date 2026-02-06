@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 import '../styles/components/RecentLetters.css';
 
 // --- APPROVAL STAGE DEFINITIONS (MUST BE CONSISTENT ACROSS ALL RELEVANT FILES) ---
@@ -37,18 +37,22 @@ function RecentLetters({ letters }) {
         <table>
           <thead>
             <tr>
-              {/* <td>ID</td> */}
               <td>Type</td>
+              <td>Reason</td>
+              <td>Requested Date</td>
+              <td>Submitted Date</td>
               <td>Status</td>
               <td>Last Updated</td>
-              <td>Action</td> {/* <-- New table header for the button */}
+              <td>Action</td>
             </tr>
           </thead>
           <tbody>
-            {letters.map(({ _id, type, status, lastUpdated }) => (
+            {letters.map(({ _id, type, reason, date, submittedDate, status, lastUpdated }) => (
               <tr key={_id}>
-                {/* <td data-label="ID">{_id}</td> */}
                 <td data-label="Type">{type}</td>
+                <td data-label="Reason">{reason || 'N/A'}</td>
+                <td data-label="Requested Date">{date ? new Date(date).toLocaleDateString() : 'N/A'}</td>
+                <td data-label="Submitted Date">{submittedDate ? new Date(submittedDate).toLocaleDateString() : 'N/A'}</td>
                 <td data-label="Status">
                   <span
                     className="status-badge"
@@ -60,17 +64,17 @@ function RecentLetters({ letters }) {
                 <td data-label="Last Updated">{lastUpdated ? new Date(lastUpdated).toLocaleDateString() : 'N/A'}</td>
                 <td data-label="Action">
                   <Link
-                    to={`/documents/${_id}`} // <-- Link to the DocumentsView page
+                    to={`/documents/${_id}`}
                     className="view-details-btn"
-                    style={{ /* Inline styles for the button, you can move this to CSS */
-                        backgroundColor: '#007bff', /* Example blue */
-                        color: 'white',
-                        padding: '6px 12px',
-                        border: 'none',
-                        borderRadius: '5px',
-                        textDecoration: 'none',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.3s ease'
+                    style={{
+                      backgroundColor: '#007bff',
+                      color: 'white',
+                      padding: '6px 12px',
+                      border: 'none',
+                      borderRadius: '5px',
+                      textDecoration: 'none',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.3s ease'
                     }}
                   >
                     View Details

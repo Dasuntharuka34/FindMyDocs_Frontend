@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import RecentLetters from '../components/RecentLetters';
+import RecentRequests from '../components/RecentRequests';
 import NotificationsWidget from '../components/NotificationsWidget';
 import NewLetterModal from '../components/NewLetterModal';
 
@@ -31,6 +31,9 @@ function Dashboard() {
 
 
   const [letters, setLetters] = useState([]);
+  const [excuseRequests, setExcuseRequests] = useState([]);
+  const [leaveRequests, setLeaveRequests] = useState([]);
+  const [allRequests, setAllRequests] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -55,12 +58,49 @@ function Dashboard() {
       }
       const data = await response.json();
       setLetters(data);
-
-
-
     } catch (error) {
       console.error("Error fetching letters:", error);
       setMessageModal({ show: true, title: 'Error', message: `Failed to load letters: ${error.message}`, onConfirm: closeMessageModal });
+    }
+  }, [user, token]);
+
+  const fetchExcuseRequests = React.useCallback(async () => {
+    if (!user || !user._id) return;
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/excuserequests/byUser/${user._id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setExcuseRequests(data);
+    } catch (error) {
+      console.error("Error fetching excuse requests:", error);
+      setMessageModal({ show: true, title: 'Error', message: `Failed to load excuse requests: ${error.message}`, onConfirm: closeMessageModal });
+    }
+  }, [user, token]);
+
+  const fetchLeaveRequests = React.useCallback(async () => {
+    if (!user || !user._id) return;
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/leaverequests/byUser/${user._id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setLeaveRequests(data);
+    } catch (error) {
+      console.error("Error fetching leave requests:", error);
+      setMessageModal({ show: true, title: 'Error', message: `Failed to load leave requests: ${error.message}`, onConfirm: closeMessageModal });
     }
   }, [user, token]);
 
@@ -87,9 +127,29 @@ function Dashboard() {
   useEffect(() => {
     if (user && user._id) {
       fetchLetters();
+      fetchExcuseRequests();
+      fetchLeaveRequests();
       fetchNotifications();
     }
-  }, [user, fetchLetters, fetchNotifications]);
+  }, [user, fetchLetters, fetchExcuseRequests, fetchLeaveRequests, fetchNotifications]);
+
+  // Combine all requests and sort by submitted date
+  useEffect(() => {
+    const combined = [
+      ...letters.map(l => ({ ...l, requestType: 'Letter' })),
+      ...excuseRequests.map(e => ({ ...e, requestType: 'Excuse' })),
+      ...leaveRequests.map(l => ({ ...l, requestType: 'Leave' }))
+    ];
+
+    // Sort by submittedDate in descending order (most recent first)
+    const sorted = combined.sort((a, b) => {
+      const dateA = new Date(a.submittedDate || a.createdAt || 0);
+      const dateB = new Date(b.submittedDate || b.createdAt || 0);
+      return dateB - dateA;
+    }).slice(0, 5); // Limit to 5 most recent requests
+
+    setAllRequests(sorted);
+  }, [letters, excuseRequests, leaveRequests]);
 
   // Handle new letter submit (for non-Medical Certificate/Leave Request letters)
   const addLetter = async (newLetterData) => {
@@ -175,7 +235,7 @@ function Dashboard() {
       </section>
 
       <section className="bottom-widgets">
-        <RecentLetters letters={letters} />
+        <RecentRequests requests={allRequests} />
         <div className="new-letter-button-container">
           <button
             className="new-letter-btn"
