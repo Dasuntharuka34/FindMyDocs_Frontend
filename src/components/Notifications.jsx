@@ -21,7 +21,7 @@ function Notifications({ notifications }) {
       <ul>
         {notifications.map(({ _id, message, type }) => ( // Use _id for MongoDB documents
           <li
-            key={_id} // <-- මෙහි _id එක key prop එක ලෙස එකතු කර ඇත.
+            key={_id}
             className="notification-item"
             style={{
               backgroundColor: alertColors[type] || '#eee',
