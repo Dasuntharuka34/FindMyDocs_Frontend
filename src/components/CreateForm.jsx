@@ -22,7 +22,7 @@ const CreateForm = () => {
     newFormFields[index][event.target.name] = event.target.value;
     setFormFields(newFormFields);
   };
-  
+
   const handleCheckboxChange = (index, event) => {
     const newFormFields = [...formFields];
     newFormFields[index][event.target.name] = event.target.checked;
@@ -39,7 +39,7 @@ const CreateForm = () => {
         validation: { required: field.required },
       }));
 
-      const response = await api.post('/forms', { name: formName, description: '', fields: formattedFields });
+      await api.post('/forms', { name: formName, description: '', fields: formattedFields });
       setMessage('Form created successfully!');
       setFormName('');
       setFormFields([{ fieldName: '', fieldType: 'text', required: false }]);

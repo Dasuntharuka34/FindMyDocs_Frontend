@@ -56,7 +56,7 @@ const DocumentsView = () => {
         const fetchedLetter = await letterResponse.json();
 
         if (!fetchedLetter) {
-            throw new Error("Document not found.");
+          throw new Error("Document not found.");
         }
 
         // Authorization check
@@ -65,16 +65,16 @@ const DocumentsView = () => {
         const isOwner = fetchedLetter.studentId === user._id;
 
         if (!isOwner && !isAdmin && !isApprover) {
-            setError("You are not authorized to view this document.");
-            setLoading(false);
-            return;
+          setError("You are not authorized to view this document.");
+          setLoading(false);
+          return;
         }
 
         setDocument(fetchedLetter);
 
         // Generate history from approvals array
         const generatedHistory = [];
-        
+
         // Add initial submission
         generatedHistory.push({
           stage: 0,
@@ -122,24 +122,24 @@ const DocumentsView = () => {
     };
 
     fetchDocumentDetails();
-  }, [id, user]);
+  }, [id, user, token]);
 
 
   if (loading) {
     return (
-      <p style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem'}}>Loading document details...</p>
+      <p style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem' }}>Loading document details...</p>
     );
   }
 
   if (error) {
     return (
-      <div className="error-message" style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>{error}</div>
+      <div className="error-message" style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red' }}>{error}</div>
     );
   }
 
   if (!document) {
     return (
-      <div className="error-message" style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red'}}>Document not found.</div>
+      <div className="error-message" style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red' }}>Document not found.</div>
     );
   }
 
@@ -153,7 +153,7 @@ const DocumentsView = () => {
       <div className="document-header-row">
         <h1>Document Details ({isMedicalCertificate ? 'Medical Certificate (Excuse Request)' : 'Letter'})</h1>
       </div>
-      
+
       {/* Render fields common to all letters */}
       <div className="document-info">
         <p><strong>Document ID:</strong> {document._id}</p>
@@ -161,7 +161,7 @@ const DocumentsView = () => {
         <p><strong>Current Status:</strong> {document.status}</p>
         <p><strong>Submitted By:</strong> {document.student}</p>
         <p><strong>Submitted Date:</strong> {new Date(document.submittedDate).toLocaleDateString()}</p>
-        
+
         {isMedicalCertificate ? (
           // Display Medical Certificate specific fields from the document itself (or populated old data)
           <>
@@ -178,22 +178,22 @@ const DocumentsView = () => {
             <p><strong>Lectures Missed:</strong> {excuseRequestData.lectureAbsents}</p>
             <p><strong>Application Date (Absence):</strong> {new Date(excuseRequestData.date).toLocaleDateString()}</p>
             {excuseRequestData.absences && excuseRequestData.absences.length > 0 && (
-                <div>
-                    <strong>Periods of Absence:</strong>
-                    <ul>
-                        {excuseRequestData.absences.map((abs, idx) => (
-                            <li key={idx}>Course Code: {abs.courseCode}, Date(s): {abs.date}</li>
-                        ))}
-                    </ul>
-                </div>
+              <div>
+                <strong>Periods of Absence:</strong>
+                <ul>
+                  {excuseRequestData.absences.map((abs, idx) => (
+                    <li key={idx}>Course Code: {abs.courseCode}, Date(s): {abs.date}</li>
+                  ))}
+                </ul>
+              </div>
             )}
             {document.attachments && ( // Attachments field in Letter model holds medicalFormPath
-                <p>
-                    <strong>Medical Form:</strong> {' '}
-                    <a href={`${process.env.REACT_APP_BACKEND_URL}/${document.attachments}`} target="_blank" rel="noopener noreferrer">
-                      View Medical Form
-                    </a>
-                </p>
+              <p>
+                <strong>Medical Form:</strong> {' '}
+                <a href={`${process.env.REACT_APP_BACKEND_URL}/${document.attachments}`} target="_blank" rel="noopener noreferrer">
+                  View Medical Form
+                </a>
+              </p>
             )}
           </>
         ) : (
@@ -202,15 +202,15 @@ const DocumentsView = () => {
             <p><strong>Reason for Request:</strong> {document.reason}</p>
             <p><strong>Date of Absence/Request:</strong> {new Date(document.date).toLocaleDateString()}</p>
             {document.attachments && (
-                <p>
-                  <strong>Attachments:</strong> {' '}
-                  <a href={`${document.attachments}`} target="_blank" rel="noopener noreferrer">
-                    View Attachment
-                  </a>
-                </p>
+              <p>
+                <strong>Attachments:</strong> {' '}
+                <a href={`${document.attachments}`} target="_blank" rel="noopener noreferrer">
+                  View Attachment
+                </a>
+              </p>
             )}
             {document.rejectionReason && document.status === approvalStages[approvalStages.findIndex(s => s.name === "Rejected")]?.name && (
-                <p><strong>Rejection Reason:</strong> {document.rejectionReason}</p>
+              <p><strong>Rejection Reason:</strong> {document.rejectionReason}</p>
             )}
           </>
         )}
@@ -218,7 +218,7 @@ const DocumentsView = () => {
 
       <div className="progress-section">
         <h3>Approval Progress</h3>
-        <ProgressTracker 
+        <ProgressTracker
           stages={approvalStages.map(s => s.name)}
           currentStage={document.currentStageIndex}
         />
@@ -227,26 +227,26 @@ const DocumentsView = () => {
       <div className="history-section">
         <h3>Approval History</h3>
         {history.length === 0 ? (
-            <p>No detailed history available for this document.</p>
+          <p>No detailed history available for this document.</p>
         ) : (
-            <div className="history-table">
-                <div className="history-header">
-                    <div>Stage</div>
-                    <div>Status</div>
-                    <div>Date</div>
-                    <div>Updated By</div>
-                    <div>Comments</div>
-                </div>
-                {history.map((item, index) => (
-                    <div key={index} className="history-row">
-                        <div>{item.stage === 0 ? 'Submitted' : approvalStages[item.stage]?.name || `Stage ${item.stage}`}</div>
-                        <div>{item.status}</div>
-                        <div>{new Date(item.timestamp).toLocaleString()}</div>
-                        <div>{item.updatedBy}</div>
-                        <div>{item.comments}</div>
-                    </div>
-                ))}
+          <div className="history-table">
+            <div className="history-header">
+              <div>Stage</div>
+              <div>Status</div>
+              <div>Date</div>
+              <div>Updated By</div>
+              <div>Comments</div>
             </div>
+            {history.map((item, index) => (
+              <div key={index} className="history-row">
+                <div>{item.stage === 0 ? 'Submitted' : approvalStages[item.stage]?.name || `Stage ${item.stage}`}</div>
+                <div>{item.status}</div>
+                <div>{new Date(item.timestamp).toLocaleString()}</div>
+                <div>{item.updatedBy}</div>
+                <div>{item.comments}</div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
