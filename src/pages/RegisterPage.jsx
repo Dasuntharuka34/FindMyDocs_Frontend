@@ -4,7 +4,6 @@ import universityLogo from '../assets/uoj.png';
 import Footer from '../components/Footer';
 import '../styles/pages/RegisterPage.css';
 import MessageModal from '../components/MessageModal';
-import { departments } from "../config/departments";
 import { validateEmail, validateNic } from '../utils/validation';
 
 
@@ -22,8 +21,32 @@ export default function RegisterPage() {
   });
 
   const [error, setError] = useState("");
+  const [departmentsList, setDepartmentsList] = useState([]);
+  const [rolesList, setRolesList] = useState([]);
   const [messageModal, setMessageModal] = useState({ show: false, title: '', message: '' });
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    // Fetch departments
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/departments`)
+      .then(res => res.json())
+      .then(data => setDepartmentsList(data))
+      .catch(err => console.error("Error fetching departments:", err));
+
+    // Fetch public roles
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/roles/public`)
+      .then(res => res.json())
+      .then(data => {
+        setRolesList(data);
+        // Set default accountType if 'Student' exists in fetched roles
+        if (data.some(role => role.name === 'Student')) {
+          setFormData(prev => ({ ...prev, accountType: 'Student' }));
+        } else if (data.length > 0) {
+          setFormData(prev => ({ ...prev, accountType: data[0].name }));
+        }
+      })
+      .catch(err => console.error("Error fetching roles:", err));
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -52,7 +75,7 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Frontend validation
     if (!validateEmail(formData.email)) {
       setError("Please enter a valid email address");
@@ -209,12 +232,20 @@ export default function RegisterPage() {
             onChange={handleChange}
             required
           >
-            <option value="Student">Student</option>
-            <option value="Staff">Staff</option>
-            <option value="Lecturer">Lecturer</option>
-            <option value="HOD">HOD</option>
-            <option value="Dean">Dean</option>
-            <option value="VC">VC</option>
+            {rolesList.length > 0 ? (
+              rolesList.map(role => (
+                <option key={role._id} value={role.name}>{role.name}</option>
+              ))
+            ) : (
+              <>
+                <option value="Student">Student</option>
+                <option value="Staff">Staff</option>
+                <option value="Lecturer">Lecturer</option>
+                <option value="HOD">HOD</option>
+                <option value="Dean">Dean</option>
+                <option value="VC">VC</option>
+              </>
+            )}
           </select>
 
           {formData.accountType === "Student" && (
@@ -249,9 +280,9 @@ export default function RegisterPage() {
                 }
               >
                 <option value="">-- Select Department --</option>
-                {departments.map((dept) => (
-                  <option key={dept} value={dept}>
-                    {dept}
+                {departmentsList.map((dept) => (
+                  <option key={dept._id} value={dept.name}>
+                    {dept.name}
                   </option>
                 ))}
               </select>
@@ -298,7 +329,7 @@ export default function RegisterPage() {
           <Footer />
         </div>
       </div>
-      
+
       <MessageModal
         show={messageModal.show}
         title={messageModal.title}

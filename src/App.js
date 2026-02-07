@@ -8,7 +8,6 @@ import ExcuseRequestForm from './forms/ExcuseRequestForm';
 import PendingApprovals from './pages/PendingApprovals';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import DocumentsView from './pages/DocumentsView';
 import MyLettersPage from './pages/MyLettersPage';
 import ProfilePage from './pages/ProfilePage';
 import { AuthContext } from './context/AuthContext';
@@ -22,16 +21,36 @@ import RegistrationApprovalPage from './pages/admin/RegistrationApprovalPage';
 import UserManagementPage from './pages/admin/UserManagementPage';
 import AllRequestsPage from './pages/admin/AllRequestsPage';
 import ApprovedRequestsPage from './pages/admin/ApprovedRequestsPage';
-import ManageFormsPage from './pages/ManageFormsPage';
-import NewFormPage from './pages/admin/NewFormPage';
+import AdminFormBuilder from './pages/admin/AdminFormBuilder';
 import ViewFormPage from './pages/admin/ViewFormPage';
-import EditFormPage from './pages/admin/EditFormPage';
 import AvailableFormsPage from './pages/AvailableFormsPage';
 import RenderFormPage from './pages/RenderFormPage';
+import FormSubmissionView from './pages/FormSubmissionView';
 import ReportGenerationPage from './pages/admin/ReportGenerationPage';
+import TemplateManagementPage from './pages/admin/TemplateManagementPage';
+import AutoApprovalRulesPage from './pages/admin/AutoApprovalRulesPage';
+import CustomReportPage from './pages/admin/CustomReportPage';
+import ErrorLogPage from './pages/admin/ErrorLogPage';
+import DatabaseQueryPage from './pages/admin/DatabaseQueryPage';
+import DeveloperDashboard from './pages/admin/DeveloperDashboard';
+import DatabaseManagementPage from './pages/admin/DatabaseManagementPage';
+import EmailTemplateEditorPage from './pages/admin/EmailTemplateEditorPage';
+import BulkEmailSenderPage from './pages/admin/BulkEmailSenderPage';
+import DataCleanupPage from './pages/admin/DataCleanupPage';
+import OrphanedFilesPage from './pages/admin/OrphanedFilesPage';
+import SecurityDashboard from './pages/admin/SecurityDashboard';
+import EmailLogsPage from './pages/admin/EmailLogsPage';
+import DepartmentManagementPage from './pages/admin/DepartmentManagementPage';
+import RoleManagementPage from './pages/admin/RoleManagementPage';
+import FormAnalyticsPage from './pages/admin/FormAnalyticsPage';
+import WorkflowManagementPage from './pages/admin/WorkflowManagementPage';
+import NotificationSettingsPage from './pages/admin/NotificationSettingsPage';
+import SystemConfigPage from './pages/admin/SystemConfigPage';
+import MessageModal from './components/MessageModal';
 import ContactSupportPage from './pages/ContactSupportPage';
 
 import AutoLogout from './components/AutoLogout';
+import AdminFormsPage from './pages/admin/AdminFormsPage';
 
 
 // PrivateRoute component (fixed)
@@ -42,26 +61,49 @@ const PrivateRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    return <p style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red' }}>Access Denied! You do not have permission to view this page.</p>;
+  if (allowedRoles && user && user.role) {
+    const userRoleLower = user.role.toLowerCase();
+    const isAllowed = allowedRoles.some(role => role.toLowerCase() === userRoleLower);
+
+    if (!isAllowed) {
+      return <p style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red' }}>Access Denied! You do not have permission to view this page.</p>;
+    }
   }
 
   return children;
 };
 
 function App() {
-  const { isLoggedIn, user } = useContext(AuthContext);
+  const { isLoggedIn, user, maintenanceMode, setMaintenanceMode } = useContext(AuthContext);
+  const [maintenanceMessage, setMaintenanceMessage] = React.useState('');
+
+  React.useEffect(() => {
+    const handleMaintenance = (e) => {
+      setMaintenanceMessage(e.detail.message || 'System is under maintenance.');
+      setMaintenanceMode(true);
+    };
+
+    window.addEventListener('maintenance-mode', handleMaintenance);
+    return () => window.removeEventListener('maintenance-mode', handleMaintenance);
+  }, [setMaintenanceMode]);
+
+  const handleCloseMaintenance = () => {
+    setMaintenanceMode(false);
+    // Explicitly redirect to login if not already there, 
+    // but usually a state change is enough to trigger redirection if logic is present.
+    window.location.href = '/login';
+  };
 
   return (
     <Router>
       <AutoLogout />
       <Routes>
         {/* Public Routes */}
-        <Route path="/login" element={isLoggedIn ? <Navigate to={user?.role === 'Admin' ? "/admin-dashboard" : "/dashboard"} /> : <LoginPage />} />
+        <Route path="/login" element={isLoggedIn ? <Navigate to={user?.role?.toLowerCase() === 'admin' ? "/admin-dashboard" : "/dashboard"} /> : <LoginPage />} />
 
-        <Route path="/register" element={isLoggedIn ? <Navigate to={user?.role === 'Admin' ? "/admin-dashboard" : "/dashboard"} /> : <RegisterPage />} />
+        <Route path="/register" element={isLoggedIn ? <Navigate to={user?.role?.toLowerCase() === 'admin' ? "/admin-dashboard" : "/dashboard"} /> : <RegisterPage />} />
 
-        <Route path="/" element={isLoggedIn ? <Navigate to={user?.role === 'Admin' ? "/admin-dashboard" : "/dashboard"} /> : <Navigate to="/login" />} />
+        <Route path="/" element={isLoggedIn ? <Navigate to={user?.role?.toLowerCase() === 'admin' ? "/admin-dashboard" : "/dashboard"} /> : <Navigate to="/login" />} />
 
         {/* Protected Routes */}
         <Route path="/dashboard" element={
@@ -115,7 +157,7 @@ function App() {
         <Route path="/admin/forms" element={
           <PrivateRoute allowedRoles={['Admin']}>
             <AdminLayout>
-              <ManageFormsPage />
+              <AdminFormsPage/>
             </AdminLayout>
           </PrivateRoute>
         } />
@@ -123,7 +165,7 @@ function App() {
         <Route path="/admin/forms/new" element={
           <PrivateRoute allowedRoles={['Admin']}>
             <AdminLayout>
-              <NewFormPage />
+              <AdminFormBuilder />
             </AdminLayout>
           </PrivateRoute>
         } />
@@ -139,7 +181,7 @@ function App() {
         <Route path="/admin/forms/edit/:id" element={
           <PrivateRoute allowedRoles={['Admin']}>
             <AdminLayout>
-              <EditFormPage />
+              <AdminFormBuilder />
             </AdminLayout>
           </PrivateRoute>
         } />
@@ -148,6 +190,157 @@ function App() {
           <PrivateRoute allowedRoles={['Admin']}>
             <AdminLayout>
               <ReportGenerationPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/reports/custom" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <CustomReportPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/developer/error-logs" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <ErrorLogPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/developer/query" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <DatabaseQueryPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/developer/docs" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <DeveloperDashboard />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/templates" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <TemplateManagementPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/auto-approval-rules" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <AutoApprovalRulesPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/database" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <DatabaseManagementPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/cleanup" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <DataCleanupPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/cleanup/orphaned" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <OrphanedFilesPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/security" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <SecurityDashboard />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/email-templates" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <EmailTemplateEditorPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/bulk-email" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <BulkEmailSenderPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/email-logs" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <EmailLogsPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/notification-settings" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <NotificationSettingsPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+        <Route path="/admin/system-config" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <SystemConfigPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/departments" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <DepartmentManagementPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/roles" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <RoleManagementPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/forms/analytics" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <FormAnalyticsPage />
+            </AdminLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin/workflows" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <AdminLayout>
+              <WorkflowManagementPage />
             </AdminLayout>
           </PrivateRoute>
         } />
@@ -200,15 +393,29 @@ function App() {
           </PrivateRoute>
         } />
 
-        <Route path="/documents/:id" element={
+        <Route path="/form-submission/:id" element={
           <PrivateRoute allowedRoles={['Student', 'Lecturer', 'HOD', 'Dean', 'VC', 'Admin']}>
-            {user?.role === 'Admin' ? (
+            {user?.role?.toLowerCase() === 'admin' ? (
               <AdminLayout>
-                <DocumentsView />
+                <FormSubmissionView />
               </AdminLayout>
             ) : (
               <UserLayout>
-                <DocumentsView />
+                <FormSubmissionView />
+              </UserLayout>
+            )}
+          </PrivateRoute>
+        } />
+
+        <Route path="/documents/:id" element={
+          <PrivateRoute allowedRoles={['Student', 'Lecturer', 'HOD', 'Dean', 'VC', 'Admin']}>
+            {user?.role?.toLowerCase() === 'admin' ? (
+              <AdminLayout>
+                <ProfilePage isAdmin={true} />
+              </AdminLayout>
+            ) : (
+              <UserLayout>
+                <ProfilePage />
               </UserLayout>
             )}
           </PrivateRoute>
@@ -271,6 +478,13 @@ function App() {
         {/* Catch-all route for 404 - Not Found */}
         <Route path="*" element={<p style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem' }}>404 - Page Not Found</p>} />
       </Routes>
+
+      <MessageModal
+        show={maintenanceMode}
+        title="Maintenance Mode"
+        message={maintenanceMessage}
+        onConfirm={handleCloseMaintenance}
+      />
     </Router>
   );
 }

@@ -62,7 +62,7 @@ export default function LoginPage() {
         setMessageModal({ show: true, title: 'Success', message: 'Login successful!' });
 
         if (typeof data.user === 'object' && data.user !== null && data.user.role) {
-          if (data.user.role === 'Admin') {
+          if (data.user.role.toLowerCase() === 'admin') {
             navigate('/admin-dashboard');
           } else {
             navigate('/dashboard');

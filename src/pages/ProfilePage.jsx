@@ -250,7 +250,7 @@ const ProfilePage = ({ isAdmin = false }) => {
           <div className="profile-info-group"><strong>Mobile:</strong><span>{user.mobile || 'N/A'}</span></div>
           <div className="profile-info-group"><strong>Role:</strong><span>{user.role}</span></div>
           <div className="profile-info-group"><strong>Department:</strong><span>{user.department || 'N/A'}</span></div>
-          {user.role === 'Student' && (
+          {user.role?.toLowerCase() === 'student' && (
             <div className="profile-info-group"><strong>Index Number:</strong><span>{user.indexNumber || 'N/A'}</span></div>
           )}
           <div className="profile-actions">
@@ -288,7 +288,7 @@ const ProfilePage = ({ isAdmin = false }) => {
             <input type="text" id="department" name="department" value={editFormData.department} onChange={handleEditFormChange} required disabled />
 
           </div>
-          {editFormData.role === 'Student' && (
+          {editFormData.role?.toLowerCase() === 'student' && (
             <div className="form-group">
               <label htmlFor="indexNumber">Index Number:</label>
               <input type="text" id="indexNumber" name="indexNumber"

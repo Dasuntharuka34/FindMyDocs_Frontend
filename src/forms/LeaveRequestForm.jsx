@@ -101,12 +101,12 @@ const LeaveRequestForm = () => {
       for (const key in formData) {
         formDataToSend.append(key, formData[key]);
       }
-      
+
       // Append the file directly if it exists
       if (leaveForm) {
         formDataToSend.append('leaveForm', leaveForm); // Key 'leaveForm' matches multer field name
       }
-      
+
       // Append user details from AuthContext
       formDataToSend.append('requesterId', user._id);
       formDataToSend.append('requesterName', user.name);
@@ -154,12 +154,12 @@ const LeaveRequestForm = () => {
   };
 
   if (!user) {
-    return <p style={{textAlign: 'center', marginTop: '50px', fontSize: '1.5rem'}}>Loading user data...</p>;
+    return <p style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem' }}>Loading user data...</p>;
   }
 
-  // Role check
-  const allowedRoles = ['Lecturer', 'HOD', 'Dean'];
-  if (!allowedRoles.includes(user.role)) {
+  // Role check - case insensitive
+  const allowedRoles = ['lecturer', 'hod', 'dean'];
+  if (!allowedRoles.includes(user.role?.toLowerCase())) {
     return (
       <div className="unauthorized-container">
         <h2 className="unauthorized-title">Access Denied ⚠️</h2>

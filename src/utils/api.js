@@ -31,6 +31,17 @@ api.interceptors.response.use(
       sessionStorage.removeItem('user');
       window.location.href = '/login';
     }
+
+    // Check for maintenance mode (503 Service Unavailable)
+    if (error.response?.status === 503 && error.response?.data?.maintenance) {
+      // We can't directly access AuthContext here, so we use a custom event
+      // or rely on the fact that the app will catch this error.
+      // However, a simple way to communicate to the root app is a custom event:
+      window.dispatchEvent(new CustomEvent('maintenance-mode', {
+        detail: { message: error.response.data.message }
+      }));
+    }
+
     return Promise.reject(error);
   }
 );

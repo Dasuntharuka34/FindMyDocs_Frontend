@@ -33,6 +33,7 @@ function Dashboard() {
   const [letters, setLetters] = useState([]);
   const [excuseRequests, setExcuseRequests] = useState([]);
   const [leaveRequests, setLeaveRequests] = useState([]);
+  const [formSubmissions, setFormSubmissions] = useState([]);
   const [allRequests, setAllRequests] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -43,6 +44,26 @@ function Dashboard() {
   const closeMessageModal = () => {
     setMessageModal({ show: false, title: '', message: '' });
   };
+
+  const fetchFormSubmissions = React.useCallback(async () => {
+    if (!user || !user._id) return;
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/form-submissions/my-submissions`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setFormSubmissions(data);
+    } catch (error) {
+      console.error("Error fetching form submissions:", error);
+      setMessageModal({ show: true, title: 'Error', message: `Failed to load form submissions: ${error.message}`, onConfirm: closeMessageModal });
+    }
+  }, [user, token]);
 
   const fetchLetters = React.useCallback(async () => {
     if (!user || !user._id) return;
@@ -129,16 +150,18 @@ function Dashboard() {
       fetchLetters();
       fetchExcuseRequests();
       fetchLeaveRequests();
+      fetchFormSubmissions();
       fetchNotifications();
     }
-  }, [user, fetchLetters, fetchExcuseRequests, fetchLeaveRequests, fetchNotifications]);
+  }, [user, fetchLetters, fetchExcuseRequests, fetchLeaveRequests, fetchFormSubmissions, fetchNotifications]);
 
   // Combine all requests and sort by submitted date
   useEffect(() => {
     const combined = [
       ...letters.map(l => ({ ...l, requestType: 'Letter' })),
       ...excuseRequests.map(e => ({ ...e, requestType: 'Excuse' })),
-      ...leaveRequests.map(l => ({ ...l, requestType: 'Leave' }))
+      ...leaveRequests.map(l => ({ ...l, requestType: 'Leave' })),
+      ...formSubmissions.map(f => ({ ...f, requestType: 'FormSubmission', purpose: f.form?.name }))
     ];
 
     // Sort by submittedDate in descending order (most recent first)

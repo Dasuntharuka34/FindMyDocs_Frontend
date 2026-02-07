@@ -20,11 +20,14 @@
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 6px rgb(0 0 0 / 0.1);
-  margin-bottom: 30px; /* Provides space between the two tables */
+  margin-bottom: 30px;
+  /* Provides space between the two tables */
 }
+
 h2 {
   color: var(--text-h2);
 }
+
 /* Table styling, copied from MyLettersPage for consistency */
 .approvals-table {
   width: 100%;
@@ -55,7 +58,8 @@ h2 {
   border-radius: 5px;
   font-weight: bold;
   color: white;
-  background-color: #787b7e; /* Default gray */
+  background-color: #787b7e;
+  /* Default gray */
 }
 
 .status-badge.pending,
@@ -76,7 +80,8 @@ h2 {
 
 /* Action button styles */
 .approve-btn,
-.reject-btn {
+.reject-btn,
+.bulk-action-btn {
   color: white;
   padding: 8px 15px;
   border: none;
@@ -88,7 +93,8 @@ h2 {
 }
 
 .approve-btn {
-  background-color: #4CAF50; /* Green */
+  background-color: #4CAF50;
+  /* Green */
 }
 
 .approve-btn:hover {
@@ -97,7 +103,8 @@ h2 {
 }
 
 .reject-btn {
-  background-color: #f44336; /* Red */
+  background-color: #f44336;
+  /* Red */
 }
 
 .reject-btn:hover {
@@ -128,7 +135,10 @@ h2 {
 /* Modal styling */
 .modal-backdrop {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -200,6 +210,7 @@ h2 {
 
 /* --- Responsive Styles (for mobile) --- */
 @media (max-width: 768px) {
+
   .approvals-table th,
   .approvals-table td {
     padding: 8px 10px;
@@ -213,7 +224,8 @@ h2 {
   }
 
   .approvals-table thead {
-    display: none; /* Hide header on mobile */
+    display: none;
+    /* Hide header on mobile */
   }
 
   .approvals-table tr {

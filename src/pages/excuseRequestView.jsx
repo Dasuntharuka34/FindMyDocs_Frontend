@@ -3,16 +3,6 @@ import { useParams } from 'react-router-dom';
 import ProgressTracker from '../components/ProgressTracker';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/pages/ExcuseRequestView.css';
-// --- APPROVAL STAGE DEFINITIONS (MUST BE CONSISTENT WITH BACKEND) ---
-const approvalStages = [
-  { name: "Submitted", approverRole: null },
-  { name: "Pending Lecturer Approval", approverRole: "Lecturer" },
-  { name: "Pending HOD Approval", approverRole: "HOD" },
-  { name: "Pending Dean Approval", approverRole: "Dean" },
-  { name: "Approved", approverRole: null }
-];
-// --- END APPROVAL STAGE DEFINITIONS ---
-
 const ExcuseRequestView = () => {
   const { id } = useParams();
   const { user, token } = useContext(AuthContext);
@@ -21,6 +11,10 @@ const ExcuseRequestView = () => {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [workflowStages, setWorkflowStages] = useState([]);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [showRejectInput, setShowRejectInput] = useState(false);
 
   useEffect(() => {
     const fetchExcuseRequestDetails = async () => {
@@ -40,6 +34,26 @@ const ExcuseRequestView = () => {
       setExcuseRequest(null);
 
       try {
+        // Fetch workflow first to get the correct stages
+        const workflowResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/workflows/Excuse`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        let stages = [];
+        if (workflowResponse.ok) {
+          const workflowData = await workflowResponse.json();
+          stages = workflowData.steps || [];
+        } else {
+          // Fallback if workflow fetch fails
+          stages = [
+            { name: "Submitted", approverRole: null },
+            { name: "Pending Lecturer Approval", approverRole: "Lecturer" },
+            { name: "Pending HOD Approval", approverRole: "HOD" },
+            { name: "Pending Dean Approval", approverRole: "Dean" },
+            { name: "Approved", approverRole: null }
+          ];
+        }
+        setWorkflowStages(stages);
+
         // Fetch the excuse request
         const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/excuserequests/${id}`, {
           headers: {
@@ -59,8 +73,9 @@ const ExcuseRequestView = () => {
         }
 
         // Authorization check
-        const isApprover = approvalStages.some(stage => stage.approverRole === user.role);
-        const isAdmin = user.role === 'Admin';
+        const userRoleLower = user.role?.toLowerCase();
+        const isApprover = stages.some(stage => stage.approverRole?.toLowerCase() === userRoleLower);
+        const isAdmin = userRoleLower === 'admin';
         const isOwner = fetchedRequest.studentId === user._id;
 
         if (!isOwner && !isAdmin && !isApprover) {
@@ -135,6 +150,48 @@ const ExcuseRequestView = () => {
 
     fetchExcuseRequestDetails();
   }, [id, user, token]);
+
+  const handleStatusUpdate = async (status) => {
+    if (status === 'Rejected' && !showRejectInput) {
+      setShowRejectInput(true);
+      return;
+    }
+
+    if (status === 'Rejected' && !rejectionReason.trim()) {
+      alert('Please provide a reason for rejection.');
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      const endpoint = status === 'Approved' ? 'approve' : 'reject';
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/excuserequests/${id}/${endpoint}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          comment: status === 'Rejected' ? rejectionReason : undefined
+        })
+      });
+
+      if (response.ok) {
+        alert(`Request ${status.toLowerCase()} successfully.`);
+        setShowRejectInput(false);
+        setRejectionReason('');
+        // Re-fetch details - simpler to reload the page or re-call fetch
+        window.location.reload();
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error updating status.');
+      }
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -238,13 +295,60 @@ const ExcuseRequestView = () => {
             </a>
           </div>
         )}
+
+        {/* Approval Actions */}
+        {user && excuseRequest.status !== 'Approved' && excuseRequest.status !== 'Rejected' &&
+          (user.role === 'Admin' || (workflowStages[excuseRequest.currentStageIndex]?.approverRole === user.role)) && (
+            <div className="approval-actions-card">
+              <h3>Approval Actions</h3>
+              <p>You are authorized to review this request.</p>
+
+              {showRejectInput && (
+                <textarea
+                  className="rejection-textarea"
+                  placeholder="Explain why this request is being rejected..."
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  rows={4}
+                />
+              )}
+
+              <div className="action-buttons-group">
+                <button
+                  className="approve-btn"
+                  onClick={() => handleStatusUpdate('Approved')}
+                  disabled={actionLoading}
+                >
+                  {actionLoading ? 'Processing...' : 'Approve'}
+                </button>
+                <button
+                  className="reject-btn"
+                  onClick={() => handleStatusUpdate('Rejected')}
+                  disabled={actionLoading}
+                >
+                  {showRejectInput ? 'Confirm Reject' : 'Reject'}
+                </button>
+                {showRejectInput && (
+                  <button className="cancel-btn" onClick={() => setShowRejectInput(false)}>
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
       </div>
 
       <div className="progress-section">
         <h3>Approval Progress</h3>
         <ProgressTracker
-          stages={approvalStages.map(s => s.name)}
-          currentStage={excuseRequest.currentStageIndex}
+          stages={["Submitted", ...workflowStages.map(s => s.name), "Approved"]}
+          currentStage={
+            excuseRequest.status === "Approved"
+              ? workflowStages.length + 1
+              : excuseRequest.status === "Submitted"
+                ? 0
+                : excuseRequest.currentStageIndex + 1
+          }
           isRejected={excuseRequest.status === "Rejected"}
         />
       </div>
@@ -264,7 +368,13 @@ const ExcuseRequestView = () => {
             </div>
             {history.map((item, index) => (
               <div key={index} className="history-row">
-                <div>{item.stage === 0 ? 'Submitted' : approvalStages[item.stage]?.name || `Stage ${item.stage}`}</div>
+                <div>
+                  {item.status === 'Submitted'
+                    ? 'Submitted'
+                    : item.status === 'Approved' && item.stage > workflowStages.length
+                      ? 'Final Approval'
+                      : workflowStages[item.stage - 1]?.name || `Stage ${item.stage}`}
+                </div>
                 <div>{item.status}</div>
                 <div>{new Date(item.timestamp).toLocaleString()}</div>
                 <div>{item.updatedBy}</div>

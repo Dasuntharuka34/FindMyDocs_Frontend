@@ -22,17 +22,17 @@ import {
   Tooltip,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Download as DownloadIcon } from '@mui/icons-material';
+import { Download as DownloadIcon, BarChart as ReportIcon } from '@mui/icons-material';
 import { AuthContext } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
   borderRadius: theme.shape.borderRadius * 2,
-  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
   backdropFilter: 'blur(4px)',
   WebkitBackdropFilter: 'blur(4px)',
   border: '1px solid rgba(255, 255, 255, 0.18)',
-  background: 'rgba(255, 255, 255, 0.9)',
+  background: 'var(--card-bg)',
 }));
 
 const ReportGenerationPage = () => {
@@ -241,12 +241,24 @@ const ReportGenerationPage = () => {
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <StyledPaper>
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: '#1a237e' }}>
-          Admin Report Generation
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 4, color: '#555' }}>
-          Generate detailed reports for user registrations, form submissions, and various requests within a specific date range.
-        </Typography>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+          <Box>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'var(--text-h2)' }}>
+              Admin Report Generation
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'var(--text-primary)' }}>
+              Generate detailed reports for user registrations, form submissions, and various requests.
+            </Typography>
+          </Box>
+          <Button
+            component={Link}
+            to="/admin/reports/custom"
+            variant="outlined"
+            startIcon={<ReportIcon />}
+          >
+            Custom Report Builder
+          </Button>
+        </Box>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={4}>
             <TextField

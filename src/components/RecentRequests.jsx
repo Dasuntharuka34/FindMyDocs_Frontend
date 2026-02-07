@@ -58,6 +58,8 @@ function RecentRequests({ requests }) {
                                 viewLink = `/excuse-request/${_id}`;
                             } else if (requestType === 'Leave') {
                                 viewLink = `/leave-request/${_id}`;
+                            } else if (requestType === 'FormSubmission') {
+                                viewLink = `/form-submission/${_id}`;
                             }
 
                             return (

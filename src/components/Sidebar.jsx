@@ -7,7 +7,7 @@ function Sidebar() {
   const { user } = useContext(AuthContext);
 
   const getDashboardPath = () => {
-    if (user && user.role === 'Admin') {
+    if (user && user.role?.toLowerCase() === 'admin') {
       return '/admin-dashboard';
     } else {
       return '/dashboard';
@@ -20,16 +20,19 @@ function Sidebar() {
         <li className="sidebar-item">
           <Link to={getDashboardPath()} className="sidebar-link">Dashboard</Link>
         </li>
-        {user && user.role !== 'VC' && (
+        {user && user.role?.toLowerCase() !== 'vc' && (
           <li className="sidebar-item">
             <Link to="/my-letters" className="sidebar-link">My Letters</Link>
           </li>
         )}
-        {user && (user.role === 'Lecturer' || user.role === 'HOD' || user.role === 'Dean' || user.role === 'VC' || user.role === 'Staff') && (
-          <li className="sidebar-item">
-            <Link to="/pending-approvals" className="sidebar-link">Pending Approvals</Link>
-          </li>
-        )}
+        {user && (() => {
+          const role = user.role?.toLowerCase();
+          return ['lecturer', 'hod', 'dean', 'vc', 'staff'].includes(role);
+        })() && (
+            <li className="sidebar-item">
+              <Link to="/pending-approvals" className="sidebar-link">Pending Approvals</Link>
+            </li>
+          )}
         <li className="sidebar-item">
           <Link to="/notifications" className="sidebar-link">Notifications</Link>
         </li>

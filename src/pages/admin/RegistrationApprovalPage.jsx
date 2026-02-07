@@ -76,7 +76,7 @@ export default function RegistrationApprovalPage() {
   }, []);
 
   useEffect(() => {
-    if (user && user.role === 'Admin') {
+    if (user && user.role?.toLowerCase() === 'admin') {
       fetchPendingRegistrations();
     }
   }, [user, fetchPendingRegistrations]);
@@ -119,7 +119,7 @@ export default function RegistrationApprovalPage() {
     setViewingRegistration(null);
   };
 
-  if (!user || user.role !== 'Admin') {
+  if (!user || user.role?.toLowerCase() !== 'admin') {
     return <p style={{ textAlign: 'center', marginTop: '50px', fontSize: '1.5rem', color: 'red' }}>Access Denied! You do not have administrator privileges.</p>;
   }
 

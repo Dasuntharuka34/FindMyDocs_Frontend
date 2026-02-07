@@ -4,16 +4,6 @@ import ProgressTracker from '../components/ProgressTracker';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/pages/ExcuseRequestView.css';
 
-// --- APPROVAL STAGE DEFINITIONS ---
-const approvalStages = [
-  { name: "Submitted", approverRole: null },
-  { name: "Pending Lecturer Approval", approverRole: "Lecturer" },
-  { name: "Pending HOD Approval", approverRole: "HOD" },
-  { name: "Pending Dean Approval", approverRole: "Dean" },
-  { name: "Pending VC Approval", approverRole: "VC" },
-  { name: "Approved", approverRole: null }
-];
-
 const LeaveRequestView = () => {
   const { id } = useParams();
   const { user, token } = useContext(AuthContext);
@@ -21,6 +11,10 @@ const LeaveRequestView = () => {
   const [leaveRequest, setLeaveRequest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [workflowStages, setWorkflowStages] = useState([]);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [showRejectInput, setShowRejectInput] = useState(false);
 
   useEffect(() => {
     const fetchLeaveRequestDetails = async () => {
@@ -40,6 +34,26 @@ const LeaveRequestView = () => {
       setLeaveRequest(null);
 
       try {
+        // Fetch workflow first
+        const workflowResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/workflows/Leave`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        let stages = [];
+        if (workflowResponse.ok) {
+          const workflowData = await workflowResponse.json();
+          stages = workflowData.steps || [];
+        } else {
+          // Fallback
+          stages = [
+            { name: "Submitted", approverRole: null },
+            { name: "Pending Lecturer Approval", approverRole: "Lecturer" },
+            { name: "Pending HOD Approval", approverRole: "HOD" },
+            { name: "Pending Dean Approval", approverRole: "Dean" },
+            { name: "Approved", approverRole: null }
+          ];
+        }
+        setWorkflowStages(stages);
+
         const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/leaverequests/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -56,8 +70,9 @@ const LeaveRequestView = () => {
         const fetchedRequest = await response.json();
 
         // Authorization check
-        const isApprover = approvalStages.some(stage => stage.approverRole === user.role);
-        const isAdmin = user.role === 'Admin';
+        const userRoleLower = user.role?.toLowerCase();
+        const isApprover = stages.some(stage => stage.approverRole?.toLowerCase() === userRoleLower);
+        const isAdmin = userRoleLower === 'admin';
         const isOwner = fetchedRequest.studentId === user._id;
 
         if (!isOwner && !isAdmin && !isApprover) {
@@ -78,6 +93,47 @@ const LeaveRequestView = () => {
 
     fetchLeaveRequestDetails();
   }, [id, user, token]);
+
+  const handleStatusUpdate = async (status) => {
+    if (status === 'Rejected' && !showRejectInput) {
+      setShowRejectInput(true);
+      return;
+    }
+
+    if (status === 'Rejected' && !rejectionReason.trim()) {
+      alert('Please provide a reason for rejection.');
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      const endpoint = status === 'Approved' ? 'approve' : 'reject';
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/leaverequests/${id}/${endpoint}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          comment: status === 'Rejected' ? rejectionReason : undefined
+        })
+      });
+
+      if (response.ok) {
+        alert(`Request ${status.toLowerCase()} successfully.`);
+        setShowRejectInput(false);
+        setRejectionReason('');
+        window.location.reload();
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error updating status.');
+      }
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -115,7 +171,7 @@ const LeaveRequestView = () => {
           comments = `Pending approval from ${approval.approverRole}`;
       }
       return {
-        stage: approvalStages.findIndex(stage => stage.approverRole === approval.approverRole),
+        stage: workflowStages.findIndex(stage => stage.approverRole === approval.approverRole),
         status: status,
         timestamp: approval.approvedAt || new Date(),
         updatedBy: approval.approverName || approval.approverRole || 'System',
@@ -159,13 +215,61 @@ const LeaveRequestView = () => {
             </a>
           </p>
         )}
+
+        {/* Approval Actions */}
+        {user && leaveRequest.status !== 'Approved' && leaveRequest.status !== 'Rejected' &&
+          (user.role === 'Admin' || (workflowStages[leaveRequest.currentStageIndex]?.approverRole === user.role)) && (
+            <div className="approval-actions-card">
+              <h3>Approval Actions</h3>
+              <p>You are authorized to review this request.</p>
+
+              {showRejectInput && (
+                <textarea
+                  className="rejection-textarea"
+                  placeholder="Explain why this request is being rejected..."
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  rows={4}
+                />
+              )}
+
+              <div className="action-buttons-group">
+                <button
+                  className="approve-btn"
+                  onClick={() => handleStatusUpdate('Approved')}
+                  disabled={actionLoading}
+                >
+                  {actionLoading ? 'Processing...' : 'Approve'}
+                </button>
+                <button
+                  className="reject-btn"
+                  onClick={() => handleStatusUpdate('Rejected')}
+                  disabled={actionLoading}
+                >
+                  {showRejectInput ? 'Confirm Reject' : 'Reject'}
+                </button>
+                {showRejectInput && (
+                  <button className="cancel-btn" onClick={() => setShowRejectInput(false)}>
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
       </div>
 
       <div className="progress-section">
         <h3>Approval Progress</h3>
         <ProgressTracker
-          stages={approvalStages.map(s => s.name)}
-          currentStage={leaveRequest.currentStageIndex}
+          stages={["Submitted", ...workflowStages.map(s => s.name), "Approved"]}
+          currentStage={
+            leaveRequest.status === "Approved"
+              ? workflowStages.length + 1
+              : leaveRequest.status === "Submitted"
+                ? 0
+                : leaveRequest.currentStageIndex + 1
+          }
+          isRejected={leaveRequest.status === "Rejected"}
         />
       </div>
 
@@ -184,7 +288,13 @@ const LeaveRequestView = () => {
             </div>
             {history.map((item, index) => (
               <div key={index} className="history-row">
-                <div>{item.stage === 0 ? 'Submitted' : approvalStages[item.stage]?.name || `Stage ${item.stage}`}</div>
+                <div>
+                  {item.status === 'Submitted'
+                    ? 'Submitted'
+                    : item.status === 'Approved' && item.stage > workflowStages.length
+                      ? 'Final Approval'
+                      : workflowStages[item.stage - 1]?.name || `Stage ${item.stage}`}
+                </div>
                 <div>{item.status}</div>
                 <div>{new Date(item.timestamp).toLocaleString()}</div>
                 <div>{item.updatedBy}</div>

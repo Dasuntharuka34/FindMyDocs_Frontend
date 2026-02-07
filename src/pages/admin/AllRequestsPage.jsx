@@ -11,9 +11,9 @@ const AllRequestsPage = () => {
   const [excuseRequests, setExcuseRequests] = useState([]);
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [letters, setLetters] = useState([]);
+  const [formSubmissions, setFormSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
 
   const {
     searchTerm,
@@ -35,14 +35,16 @@ const AllRequestsPage = () => {
       }
 
       try {
-        const [excuseRes, leaveRes, letterRes] = await Promise.all([
+        const [excuseRes, leaveRes, letterRes, formRes] = await Promise.all([
           api.get(`/excuserequests`),
           api.get(`/leaverequests`),
           api.get(`/letters`),
+          api.get(`/form-submissions`),
         ]);
         setExcuseRequests(excuseRes.data);
         setLeaveRequests(leaveRes.data);
         setLetters(letterRes.data);
+        setFormSubmissions(formRes.data);
       } catch (err) {
         console.error('Error fetching all requests:', err);
         setError('Failed to fetch requests. Please try again.');
@@ -200,6 +202,44 @@ const AllRequestsPage = () => {
                     <td>{new Date(letter.submittedDate).toLocaleDateString()}</td>
                     <td>
                       <Link to={`/documents/${letter._id}`} className="view-details-btn">
+                        View Details
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <section className="request-section">
+        <h2>Dynamic Form Submissions</h2>
+        {applyFiltersAndSorting(formSubmissions).length === 0 ? (
+          <p>No form submissions found.</p>
+        ) : (
+          <div className="table-responsive">
+            <table className="requests-table">
+              <thead>
+                <tr>
+                  <th>Form Name</th>
+                  <th>Student Name</th>
+                  <th>Status</th>
+                  <th>Submitted Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {applyFiltersAndSorting(formSubmissions).map((submission) => (
+                  <tr key={submission._id}>
+                    <td>{submission.form?.name || 'Unknown Form'}</td>
+                    <td>{submission.submittedBy?.name || 'N/A'}</td>
+                    <td><span className={`status-badge ${submission.status ? submission.status.toLowerCase().replace(/\s/g, '-') : ''}`}>
+                      {submission.status}
+                    </span></td>
+                    <td>{new Date(submission.submittedAt).toLocaleDateString()}</td>
+                    <td>
+                      <Link to={`/form-submission/${submission._id}`} className="view-details-btn">
                         View Details
                       </Link>
                     </td>

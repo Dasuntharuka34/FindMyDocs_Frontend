@@ -6,6 +6,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
 
   useEffect(() => {
     const storedToken = sessionStorage.getItem('token');
@@ -65,12 +66,21 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Logout function
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    setIsLoggedIn(false);
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('user');
+  const logout = async () => {
+    try {
+      // Import api dynamically or at the top if possible
+      // For now, let's just clear local state first for better UX, then notify backend
+      const api = (await import('../utils/api')).default;
+      await api.post('/users/logout');
+    } catch (error) {
+      console.error("Backend logout failed:", error);
+    } finally {
+      setToken(null);
+      setUser(null);
+      setIsLoggedIn(false);
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
+    }
   };
 
   // Function to update user data in context and sessionStorage
@@ -78,16 +88,16 @@ export const AuthProvider = ({ children }) => {
     setUser(prevUser => {
       // Ensure prevUser is an object before spreading its properties
       const currentPrevUser = (typeof prevUser === 'object' && prevUser !== null) ? prevUser : {};
-      
+
       const newUserState = {
         ...currentPrevUser, // Keep existing fields not explicitly updated
         ...updatedUserData // Overlay with new data from backend response
       };
-      
+
       // If profilePicture in updatedUserData is explicitly null (e.g., user removed it)
       // or if it's not provided in updatedUserData, but exists in prevUser, keep prevUser's picture.
       if (updatedUserData.profilePicture === undefined && currentPrevUser.profilePicture) {
-         newUserState.profilePicture = currentPrevUser.profilePicture;
+        newUserState.profilePicture = currentPrevUser.profilePicture;
       }
       return newUserState;
     });
@@ -97,11 +107,11 @@ export const AuthProvider = ({ children }) => {
     const parsedsessionStorageUser = (typeof currentsessionStorageUser === 'object' && currentsessionStorageUser !== null) ? currentsessionStorageUser : {};
 
     const newsessionStorageUser = {
-        ...parsedsessionStorageUser,
-        ...updatedUserData
+      ...parsedsessionStorageUser,
+      ...updatedUserData
     };
     if (updatedUserData.profilePicture === undefined && parsedsessionStorageUser.profilePicture) {
-        newsessionStorageUser.profilePicture = parsedsessionStorageUser.profilePicture;
+      newsessionStorageUser.profilePicture = parsedsessionStorageUser.profilePicture;
     }
     sessionStorage.setItem('user', JSON.stringify(newsessionStorageUser));
   };
@@ -113,6 +123,8 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     updateUser,
+    maintenanceMode,
+    setMaintenanceMode
   };
 
   return (

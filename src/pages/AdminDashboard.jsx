@@ -196,7 +196,7 @@ export default function AdminDashboard() {
 
             {recentRequests.length > 0 ? (
               <TableContainer>
-                <Table size="small">
+                <Table size="medium">
                   <TableHead>
                     <TableRow>
                       <TableCell sx={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>Name</TableCell>

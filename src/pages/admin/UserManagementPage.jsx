@@ -11,11 +11,31 @@ import {
   CircularProgress,
   IconButton,
   Typography,
-  Box
+  Box,
+  Checkbox,
+  Tooltip,
+  Paper,
+  Stack,
+  Divider,
+  FormControl,
+  InputLabel,
+  Select
 } from '@mui/material';
-import { Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon, LockReset as ResetIcon } from '@mui/icons-material';
+import {
+  Close as CloseIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  LockReset as ResetIcon,
+  UploadFile as UploadIcon,
+  History as HistoryIcon,
+  GroupAdd as GroupAddIcon,
+  Block as BlockIcon,
+  CheckCircle as ActiveIcon
+} from '@mui/icons-material';
 import { AuthContext } from '../../context/AuthContext';
 import { useRequestFilters } from '../../hooks/useRequestFilters';
+import BulkUserImport from '../../components/admin/BulkUserImport';
+import UserActivityHistory from '../../components/admin/UserActivityHistory';
 
 // Custom Dialog for notifications/confirmations
 const StatusDialog = ({ open, title, message, onConfirm, onCancel, type = 'info' }) => (
@@ -33,7 +53,7 @@ const StatusDialog = ({ open, title, message, onConfirm, onCancel, type = 'info'
   </Dialog>
 );
 
-const EditUserModal = ({ open, user, onClose, onSave, loading }) => {
+const EditUserModal = ({ open, user, departments, roles, onClose, onSave, loading }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -135,24 +155,28 @@ const EditUserModal = ({ open, user, onClose, onSave, loading }) => {
                 onChange={handleChange}
                 required
               >
-                <MenuItem value="Student">Student</MenuItem>
-                <MenuItem value="Lecturer">Lecturer</MenuItem>
-                <MenuItem value="HOD">HOD</MenuItem>
-                <MenuItem value="Dean">Dean</MenuItem>
-                <MenuItem value="Admin">Admin</MenuItem>
+                {roles.map(role => (
+                  <MenuItem key={role._id} value={role.name}>{role.name}</MenuItem>
+                ))}
               </TextField>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                name="department"
-                label="Department"
-                fullWidth
-                variant="outlined"
-                value={formData.department}
-                onChange={handleChange}
-              />
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Department</InputLabel>
+                <Select
+                  name="department"
+                  value={formData.department}
+                  onChange={handleChange}
+                  label="Department"
+                >
+                  <MenuItem value=""><em>None</em></MenuItem>
+                  {departments.map(dept => (
+                    <MenuItem key={dept._id} value={dept.name}>{dept.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
-            {formData.role === 'Student' && (
+            {formData.role?.toLowerCase() === 'student' && (
               <Grid item xs={12}>
                 <TextField
                   name="indexNumber"
@@ -186,9 +210,19 @@ const EditUserModal = ({ open, user, onClose, onSave, loading }) => {
 export default function UserManagementPage() {
   const { user: currentUser, token } = useContext(AuthContext);
   const [approvedUsers, setApprovedUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [departments, setDepartments] = useState([]);
+  const [roles, setRoles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Modals state
   const [editModal, setEditModal] = useState({ open: false, user: null });
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [historyModal, setHistoryModal] = useState({ open: false, user: null });
   const [statusDialog, setStatusDialog] = useState({ open: false, title: '', message: '', type: 'info', onConfirm: null });
+  const [bulkRoleModal, setBulkRoleModal] = useState({ open: false, role: '' });
+
+  // Bulk Selection State
+  const [selectedUsers, setSelectedUsers] = useState([]);
 
   const {
     searchTerm,
@@ -210,6 +244,20 @@ export default function UserManagementPage() {
     });
   }, []);
 
+  const fetchRoles = useCallback(async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/roles`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setRoles(data);
+      }
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  }, [token]);
+
   const fetchApprovedUsers = useCallback(async () => {
     setLoading(true);
     try {
@@ -230,8 +278,11 @@ export default function UserManagementPage() {
   }, [token, showStatus]);
 
   useEffect(() => {
-    if (token) fetchApprovedUsers();
-  }, [token, fetchApprovedUsers]);
+    if (token) {
+      fetchApprovedUsers();
+      fetchRoles();
+    }
+  }, [token, fetchApprovedUsers, fetchRoles]);
 
   const closeStatus = () => {
     setStatusDialog(prev => ({ ...prev, open: false }));
@@ -239,6 +290,10 @@ export default function UserManagementPage() {
 
   const handleEditClick = (userToEdit) => {
     setEditModal({ open: true, user: userToEdit });
+  };
+
+  const handleHistoryClick = (userToView) => {
+    setHistoryModal({ open: true, user: userToView });
   };
 
   const handleSaveUser = async (updatedData) => {
@@ -298,7 +353,7 @@ export default function UserManagementPage() {
   const handleResetPassword = (userId, userName) => {
     showStatus(
       'Confirm Reset',
-      `Reset password for ${userName} to the default value ('password123')?`,
+      `Reset password for ${userName} to the system default password?`,
       'info',
       async () => {
         try {
@@ -315,6 +370,146 @@ export default function UserManagementPage() {
         }
       }
     );
+  };
+
+  // Bulk Actions Logic
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedUsers(filteredUsers.map(u => u._id));
+    } else {
+      setSelectedUsers([]);
+    }
+  };
+
+  const handleSelectUser = (id) => {
+    if (selectedUsers.includes(id)) {
+      setSelectedUsers(selectedUsers.filter(uId => uId !== id));
+    } else {
+      setSelectedUsers([...selectedUsers, id]);
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedUsers.length === 0) return;
+
+    showStatus(
+      'Confirm Bulk Deletion',
+      `Are you sure you want to delete ${selectedUsers.length} users? This action cannot be undone.`,
+      'error',
+      async () => {
+        try {
+          const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/bulk-delete`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ userIds: selectedUsers })
+          });
+
+          if (!response.ok) throw new Error('Bulk delete failed');
+
+          await fetchApprovedUsers();
+          setSelectedUsers([]);
+          showStatus('Success', 'Selected users deleted successfully.');
+        } catch (error) {
+          showStatus('Error', error.message, 'error');
+        }
+      }
+    );
+  };
+
+  const handleBulkResetPassword = () => {
+    if (selectedUsers.length === 0) return;
+
+    showStatus(
+      'Confirm Bulk Reset',
+      `Reset passwords for ${selectedUsers.length} users to the system default password?`,
+      'warning',
+      async () => {
+        try {
+          const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/bulk-reset-password`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ userIds: selectedUsers })
+          });
+
+          if (!response.ok) throw new Error('Bulk reset failed');
+
+          await fetchApprovedUsers();
+          setSelectedUsers([]);
+          showStatus('Success', 'Passwords reset successfully to the default password.');
+        } catch (error) {
+          showStatus('Error', error.message, 'error');
+        }
+      }
+    );
+  };
+
+  const handleBulkRoleUpdate = async () => {
+    if (selectedUsers.length === 0 || !bulkRoleModal.role) return;
+
+    // Close modal first
+    setBulkRoleModal(prev => ({ ...prev, open: false }));
+
+    showStatus(
+      'Confirm Bulk Role Update',
+      `Update role to ${bulkRoleModal.role} for ${selectedUsers.length} users?`,
+      'warning',
+      async () => {
+        try {
+          const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/bulk-update-roles`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ userIds: selectedUsers, role: bulkRoleModal.role })
+          });
+
+          if (!response.ok) throw new Error('Bulk role update failed');
+
+          await fetchApprovedUsers();
+          setSelectedUsers([]);
+          setBulkRoleModal({ open: false, role: '' });
+          showStatus('Success', 'Roles updated successfully.');
+        } catch (error) {
+          showStatus('Error', error.message, 'error');
+        }
+      }
+    );
+  };
+
+  const handleToggleStatus = (userId, userName, currentStatus) => {
+    const action = currentStatus ? 'Suspend' : 'Activate';
+    showStatus(
+      `Confirm ${action}`,
+      `Are you sure you want to ${action.toLowerCase()} account for ${userName}?`,
+      currentStatus ? 'warning' : 'info',
+      async () => {
+        try {
+          const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/${userId}/toggle-status`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          if (!response.ok) throw new Error(`Failed to ${action.toLowerCase()} user`);
+
+          await fetchApprovedUsers();
+          showStatus('Success', `User ${userName} has been ${action.toLowerCase()}d.`);
+        } catch (error) {
+          showStatus('Error', error.message, 'error');
+        }
+      }
+    );
+  };
+
+  const handleImportSuccess = () => {
+    setImportModalOpen(false);
+    fetchApprovedUsers();
   };
 
   if (!currentUser || currentUser.role !== 'Admin') {
@@ -334,7 +529,50 @@ export default function UserManagementPage() {
           <Typography variant="h4" sx={{ fontWeight: 'bold', color: "var(--text-h2)" }}>
             👥 Approved Users ({approvedUsers.length})
           </Typography>
+          <Button
+            variant="contained"
+            startIcon={<UploadIcon />}
+            onClick={() => setImportModalOpen(true)}
+          >
+            Import Users
+          </Button>
         </Box>
+
+        {/* Bulk Action Toolbar */}
+        {selectedUsers.length > 0 && (
+          <Paper sx={{ p: 2, mb: 2, display: 'flex', alignItems: 'center', gap: 2, bgcolor: '#e3f2fd' }}>
+            <Typography variant="subtitle1" fontWeight="bold">
+              {selectedUsers.length} selected
+            </Typography>
+            <Button
+              variant="outlined"
+              color="primary"
+              size="small"
+              startIcon={<GroupAddIcon />}
+              onClick={() => setBulkRoleModal({ open: true, role: '' })}
+            >
+              Update Role
+            </Button>
+            <Button
+              variant="outlined"
+              color="error"
+              size="small"
+              startIcon={<DeleteIcon />}
+              onClick={handleBulkDelete}
+            >
+              Delete Selected
+            </Button>
+            <Button
+              variant="outlined"
+              color="warning"
+              size="small"
+              startIcon={<ResetIcon />}
+              onClick={handleBulkResetPassword}
+            >
+              Reset Passwords
+            </Button>
+          </Paper>
+        )}
 
         <div className="requests-controls">
           <input
@@ -372,6 +610,13 @@ export default function UserManagementPage() {
             <table className="admin-table">
               <thead>
                 <tr>
+                  <th style={{ width: 50 }}>
+                    <Checkbox
+                      checked={filteredUsers.length > 0 && selectedUsers.length === filteredUsers.length}
+                      indeterminate={selectedUsers.length > 0 && selectedUsers.length < filteredUsers.length}
+                      onChange={handleSelectAll}
+                    />
+                  </th>
                   <th>Name</th>
                   <th>Email</th>
                   <th>NIC</th>
@@ -381,22 +626,52 @@ export default function UserManagementPage() {
               </thead>
               <tbody>
                 {filteredUsers.map(u => (
-                  <tr key={u._id}>
+                  <tr key={u._id} className={selectedUsers.includes(u._id) ? 'selected-row' : ''}>
+                    <td>
+                      <Checkbox
+                        checked={selectedUsers.includes(u._id)}
+                        onChange={() => handleSelectUser(u._id)}
+                      />
+                    </td>
                     <td>{u.name}</td>
                     <td>{u.email}</td>
                     <td>{u.nic}</td>
-                    <td>{u.role}</td>
+                    <td>
+                      <span className={`role-badge ${u.role.toLowerCase()}`}>
+                        {u.role}
+                      </span>
+                    </td>
                     <td>
                       <Box display="flex" gap={1}>
-                        <IconButton onClick={() => handleEditClick(u)} color="primary" title="Edit User" size="small">
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton onClick={() => handleResetPassword(u._id, u.name)} color="secondary" title="Reset Password" size="small">
-                          <ResetIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton onClick={() => handleDeleteUser(u._id, u.name)} color="error" title="Delete User" size="small">
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
+                        <Tooltip title="View Activity History">
+                          <IconButton onClick={() => handleHistoryClick(u)} size="small" color="info">
+                            <HistoryIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={u.isActive !== false ? "Suspend User" : "Activate User"}>
+                          <IconButton
+                            onClick={() => handleToggleStatus(u._id, u.name, u.isActive !== false)}
+                            color={u.isActive !== false ? "success" : "default"}
+                            size="small"
+                          >
+                            {u.isActive !== false ? <ActiveIcon fontSize="small" /> : <BlockIcon fontSize="small" />}
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Edit User">
+                          <IconButton onClick={() => handleEditClick(u)} color="primary" size="small">
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Reset Password">
+                          <IconButton onClick={() => handleResetPassword(u._id, u.name)} color="warning" size="small">
+                            <ResetIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete User">
+                          <IconButton onClick={() => handleDeleteUser(u._id, u.name)} color="error" size="small">
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
                       </Box>
                     </td>
                   </tr>
@@ -411,9 +686,47 @@ export default function UserManagementPage() {
       <EditUserModal
         open={editModal.open}
         user={editModal.user}
+        departments={departments}
+        roles={roles}
         onClose={() => setEditModal({ open: false, user: null })}
         onSave={handleSaveUser}
         loading={loading}
+      />
+
+      {/* Bulk Import Modal */}
+      <BulkUserImport
+        open={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        onSuccess={handleImportSuccess}
+      />
+
+      {/* Bulk Role Update Modal */}
+      <Dialog open={bulkRoleModal.open} onClose={() => setBulkRoleModal({ open: false, role: '' })} maxWidth="xs" fullWidth>
+        <DialogTitle>Update Roles</DialogTitle>
+        <DialogContent dividers>
+          <TextField
+            select
+            label="New Role"
+            fullWidth
+            value={bulkRoleModal.role}
+            onChange={(e) => setBulkRoleModal({ ...bulkRoleModal, role: e.target.value })}
+          >
+            {roles.map(role => (
+              <MenuItem key={role._id} value={role.name}>{role.name}</MenuItem>
+            ))}
+          </TextField>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBulkRoleModal({ open: false, role: '' })}>Cancel</Button>
+          <Button onClick={handleBulkRoleUpdate} variant="contained" disabled={!bulkRoleModal.role}>Update</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Activity History Modal */}
+      <UserActivityHistory
+        open={historyModal.open}
+        user={historyModal.user}
+        onClose={() => setHistoryModal({ open: false, user: null })}
       />
 
       {/* Global Status/Confirm Dialog */}
