@@ -152,7 +152,7 @@ const WorkflowManagementPage = () => {
     const handleSave = async (workflow) => {
         setSaving(true);
         try {
-            const response = await api.post('/workflows', workflow);
+            await api.post('/workflows', workflow);
 
             setMessageModal({
                 show: true,

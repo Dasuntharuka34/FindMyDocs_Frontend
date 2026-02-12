@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import {
     Box,
     Typography,
@@ -17,16 +17,12 @@ import {
     Alert,
     Breadcrumbs,
     Link as MuiLink,
-    Stack,
-    Divider
+    Stack
 } from '@mui/material';
 import {
-    Delete as DeleteIcon,
     Search as SearchIcon,
     FilePresent as FileIcon,
-    DeleteSweep as DeleteAllIcon,
-    ArrowBack as BackIcon,
-    CheckCircle as CheckIcon
+    DeleteSweep as DeleteAllIcon
 } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import {
     Box,
     Typography,
@@ -39,7 +39,7 @@ const ErrorLogPage = () => {
     const [selectedLog, setSelectedLog] = useState(null);
     const [error, setError] = useState(null);
 
-    const fetchLogs = async () => {
+    const fetchLogs = useCallback(async () => {
         setLoading(true);
         try {
             const response = await axios.get(
@@ -55,11 +55,11 @@ const ErrorLogPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [page, rowsPerPage, token]);
 
     useEffect(() => {
         fetchLogs();
-    }, [page, rowsPerPage]);
+    }, [page, rowsPerPage, fetchLogs]);
 
     const handleClearLogs = async () => {
         if (!window.confirm('Are you sure you want to clear all error logs?')) return;

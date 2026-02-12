@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -8,12 +8,7 @@ import {
     Typography,
     Box,
     CircularProgress,
-    List,
-    ListItem,
-    ListItemText,
-    ListItemIcon,
     Chip,
-    Divider,
     IconButton
 } from '@mui/material';
 import {
@@ -30,13 +25,8 @@ const UserActivityHistory = ({ open, user, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        if (open && user) {
-            fetchActivity();
-        }
-    }, [open, user]);
-
-    const fetchActivity = async () => {
+    const fetchActivity = useCallback(async () => {
+        if (!user) return;
         setLoading(true);
         setError(null);
         try {
@@ -48,7 +38,13 @@ const UserActivityHistory = ({ open, user, onClose }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user]);
+
+    useEffect(() => {
+        if (open && user) {
+            fetchActivity();
+        }
+    }, [open, user, fetchActivity]);
 
     const getActivityIcon = (type) => {
         if (type.includes('Excuse')) return <DescriptionIcon />;

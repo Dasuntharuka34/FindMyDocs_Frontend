@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import {
     Box,
     Typography,
@@ -37,11 +37,7 @@ const DatabaseManagementPage = () => {
     const [restoreReport, setRestoreReport] = useState(null);
     const [dbStats, setDbStats] = useState(null);
 
-    useEffect(() => {
-        fetchStats();
-    }, []);
-
-    const fetchStats = async () => {
+    const fetchStats = useCallback(async () => {
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/database/stats`, {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -53,7 +49,11 @@ const DatabaseManagementPage = () => {
         } catch (error) {
             console.error("Failed to fetch db stats", error);
         }
-    };
+    }, [token]);
+
+    useEffect(() => {
+        fetchStats();
+    }, [fetchStats]);
 
     const handleBackup = async () => {
         setLoading(true);

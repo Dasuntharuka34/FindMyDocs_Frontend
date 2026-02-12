@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import {
     Box,
     Typography,
@@ -58,11 +58,7 @@ const EmailTemplateEditorPage = () => {
 
     const [messageModal, setMessageModal] = useState({ show: false, title: '', message: '' });
 
-    useEffect(() => {
-        fetchTemplates();
-    }, []);
-
-    const fetchTemplates = async () => {
+    const fetchTemplates = useCallback(async () => {
         setLoading(true);
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/email-management/templates`, {
@@ -76,8 +72,11 @@ const EmailTemplateEditorPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [token]);
 
+    useEffect(() => {
+        fetchTemplates();
+    }, [fetchTemplates]);
     const handleOpenModal = (template = null) => {
         if (template) {
             setIsEditing(true);

@@ -15,8 +15,6 @@ import {
   Checkbox,
   Tooltip,
   Paper,
-  Stack,
-  Divider,
   FormControl,
   InputLabel,
   Select
@@ -210,7 +208,7 @@ const EditUserModal = ({ open, user, departments, roles, onClose, onSave, loadin
 export default function UserManagementPage() {
   const { user: currentUser, token } = useContext(AuthContext);
   const [approvedUsers, setApprovedUsers] = useState([]);
-  const [departments, setDepartments] = useState([]);
+  const [departments] = useState([]);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
 

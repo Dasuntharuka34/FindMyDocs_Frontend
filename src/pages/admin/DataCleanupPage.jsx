@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import {
     Box,
     Typography,
@@ -34,11 +34,7 @@ const DataCleanupPage = () => {
 
     const [messageModal, setMessageModal] = useState({ show: false, title: '', message: '' });
 
-    useEffect(() => {
-        fetchStats();
-    }, [days]);
-
-    const fetchStats = async () => {
+    const fetchStats = useCallback(async () => {
         setLoading(true);
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cleanup/stats?days=${days}`, {
@@ -52,7 +48,11 @@ const DataCleanupPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [days, token]);
+
+    useEffect(() => {
+        fetchStats();
+    }, [fetchStats]);
 
     const handleCleanup = async () => {
         if (!window.confirm(`Are you sure you want to archive and delete ${selectedType}s older than ${days} days? This action cannot be undone.`)) return;

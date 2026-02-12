@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import ProgressTracker from '../components/ProgressTracker';
 import { AuthContext } from '../context/AuthContext';
@@ -17,7 +17,7 @@ const FormSubmissionView = () => {
     const [rejectionReason, setRejectionReason] = useState('');
     const [showRejectInput, setShowRejectInput] = useState(false);
 
-    const fetchSubmissionDetails = async () => {
+    const fetchSubmissionDetails = useCallback(async () => {
         if (!id) {
             setError("Submission ID is missing from the URL.");
             setLoading(false);
@@ -77,13 +77,13 @@ const FormSubmissionView = () => {
             setError(err.message);
             setLoading(false);
         }
-    };
+    }, [id, token]);
 
     useEffect(() => {
         if (token) {
             fetchSubmissionDetails();
         }
-    }, [id, token]);
+    }, [id, token, fetchSubmissionDetails]);
 
     const handleStatusUpdate = async (status) => {
         if (status === 'Rejected' && !showRejectInput) {

@@ -172,7 +172,7 @@ function Dashboard() {
     }).slice(0, 5); // Limit to 5 most recent requests
 
     setAllRequests(sorted);
-  }, [letters, excuseRequests, leaveRequests]);
+  }, [letters, excuseRequests, leaveRequests, formSubmissions]);
 
   // Handle new letter submit (for non-Medical Certificate/Leave Request letters)
   const addLetter = async (newLetterData) => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import {
     Box,
     Typography,
@@ -52,11 +52,9 @@ const EmailLogsPage = () => {
     // View Modal
     const [viewModal, setViewModal] = useState({ open: false, log: null });
 
-    useEffect(() => {
-        fetchLogs();
-    }, [page, limit, status, startDate, endDate]);
 
-    const fetchLogs = async () => {
+
+    const fetchLogs = useCallback(async () => {
         setLoading(true);
         try {
             let url = `${process.env.REACT_APP_BACKEND_URL}/api/email-management/logs?page=${page + 1}&limit=${limit}`;
@@ -76,8 +74,11 @@ const EmailLogsPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [page, limit, status, startDate, endDate, token]);
 
+    useEffect(() => {
+        fetchLogs();
+    }, [fetchLogs]);
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };

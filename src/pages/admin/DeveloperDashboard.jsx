@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import {
     Box,
     Typography,
@@ -15,8 +15,6 @@ import {
     Divider
 } from '@mui/material';
 import {
-    Code as CodeIcon,
-    Storage as StorageIcon,
     Speed as SpeedIcon,
     DeleteSweep as CacheIcon
 } from '@mui/icons-material';
@@ -29,7 +27,7 @@ const DeveloperDashboard = () => {
     const [routes, setRoutes] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         try {
             const [statsRes, docsRes] = await Promise.all([
@@ -43,11 +41,11 @@ const DeveloperDashboard = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [token]);
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [fetchData]);
 
     const handleClearCache = async () => {
         try {

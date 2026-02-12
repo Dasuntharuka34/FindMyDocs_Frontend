@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import {
     Box,
     Typography,
@@ -52,11 +52,8 @@ const AutoApprovalRulesPage = () => {
 
     const [messageModal, setMessageModal] = useState({ show: false, title: '', message: '' });
 
-    useEffect(() => {
-        fetchRules();
-    }, []);
 
-    const fetchRules = async () => {
+    const fetchRules = useCallback(async () => {
         setLoading(true);
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auto-approval-rules`, {
@@ -70,7 +67,11 @@ const AutoApprovalRulesPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [token]);
+
+    useEffect(() => {
+        fetchRules();
+    }, [fetchRules]);
 
     const handleOpenModal = (rule = null) => {
         if (rule) {

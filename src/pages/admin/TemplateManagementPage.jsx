@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import {
     Box,
     Typography,
@@ -56,11 +56,7 @@ const TemplateManagementPage = () => {
 
     const [messageModal, setMessageModal] = useState({ show: false, title: '', message: '' });
 
-    useEffect(() => {
-        fetchTemplates();
-    }, [filterType]);
-
-    const fetchTemplates = async () => {
+    const fetchTemplates = useCallback(async () => {
         setLoading(true);
         try {
             let url = `${process.env.REACT_APP_BACKEND_URL}/api/request-templates`;
@@ -81,7 +77,11 @@ const TemplateManagementPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [filterType, token]);
+
+    useEffect(() => {
+        fetchTemplates();
+    }, [fetchTemplates]);
 
     const handleOpenModal = (template = null) => {
         if (template) {

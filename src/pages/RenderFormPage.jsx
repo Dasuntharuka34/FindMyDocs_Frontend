@@ -8,7 +8,6 @@ import {
   TextField,
   Button,
   FormControl,
-  FormLabel,
   RadioGroup,
   FormControlLabel,
   Radio,
@@ -76,7 +75,7 @@ const RenderFormPage = () => {
     };
 
     fetchForm();
-  }, [id]);
+  }, [id, user]);
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;

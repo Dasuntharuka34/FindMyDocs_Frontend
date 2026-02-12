@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Box,
     Typography,
     Paper,
-    Grid,
     Table,
     TableBody,
     TableCell,
@@ -44,11 +43,7 @@ export default function SecurityDashboard() {
     const [loading, setLoading] = useState(true);
     const [confirmDialog, setConfirmDialog] = useState({ open: false, sessionId: null });
 
-    useEffect(() => {
-        fetchData();
-    }, [tabValue]);
-
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             setLoading(true);
             if (tabValue === 0) {
@@ -66,7 +61,11 @@ export default function SecurityDashboard() {
             console.error('Error fetching security data:', error);
             setLoading(false);
         }
-    };
+    }, [tabValue]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     const handleTerminateSession = async (sessionId) => {
         try {

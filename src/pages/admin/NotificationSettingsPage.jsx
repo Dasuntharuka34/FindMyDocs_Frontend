@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import {
     Box,
     Typography,
@@ -10,12 +10,8 @@ import {
     Button,
     CircularProgress,
     Divider,
-    Alert,
     Card,
-    CardContent,
-    IconButton,
-    Tooltip,
-    MenuItem
+    CardContent
 } from '@mui/material';
 import {
     NotificationsActive as NotificationIcon,
@@ -35,11 +31,7 @@ const NotificationSettingsPage = () => {
     const [configs, setConfigs] = useState([]);
     const [messageModal, setMessageModal] = useState({ show: false, title: '', message: '' });
 
-    useEffect(() => {
-        fetchConfigs();
-    }, []);
-
-    const fetchConfigs = async () => {
+    const fetchConfigs = useCallback(async () => {
         setLoading(true);
         try {
             // Fetch both EMAIL_SETTINGS and SYSTEM_SETTINGS related to notifications
@@ -63,7 +55,11 @@ const NotificationSettingsPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [token]);
+
+    useEffect(() => {
+        fetchConfigs();
+    }, [fetchConfigs]);
 
     const handleValueChange = (key, newValue) => {
         setConfigs(prev => prev.map(c => c.key === key ? { ...c, value: newValue } : c));
@@ -146,12 +142,7 @@ const NotificationSettingsPage = () => {
                     </Button>
                 </Box>
 
-                <Alert severity="info" sx={{ mb: 4 }}>
-                    Control how the system communicates with users through emails and real-time dashboard updates.
-                </Alert>
-
-                <Grid container spacing={4}>
-                    {/* Email Settings */}
+                <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
                         <Card elevation={2}>
                             <CardContent>
